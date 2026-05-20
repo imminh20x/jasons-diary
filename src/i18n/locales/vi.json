@@ -1,0 +1,140 @@
+{
+  "header": {
+    "logo": "Jason's Diary",
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "dashboard": "Bảng điều khiển",
+    "adminLogin": "Đăng nhập Admin",
+    "logout": "Đăng xuất",
+    "toggleTheme": "Đổi giao diện",
+    "openMenu": "Mở menu",
+    "closeMenu": "Đóng menu",
+    "language": "Ngôn ngữ",
+    "subtitle": "Đây là nơi show Portfolio của mình cũng như chia sẻ những suy nghĩ và kinh nghiệm về QA/QC và AI."
+  },
+  "footer": {
+    "navigation": "Điều hướng",
+    "connect": "Kết nối"
+  },
+  "about": {
+    "avatarAlt": "Đỗ Cao Minh - Jason",
+    "eyebrow": "Sẵn sàng cho cơ hội mới",
+    "name": "Đỗ Cao Minh - Jason",
+    "title": "QA/QC Engineer",
+    "bio": "Mình có hơn 2 năm kinh nghiệm trong lĩnh vực QA/QC, làm việc với AI và kiểm thử tự động.",
+    "contactMe": "Liên hệ",
+    "expertiseSkills": "Chuyên môn & Kỹ năng",
+    "experience": "Kinh nghiệm",
+    "educationCredentials": "Học vấn & Chứng chỉ",
+    "viewCertificate": "Xem chứng chỉ",
+    "skills": {
+      "ai": {
+        "title": "AI",
+        "desc": "Sử dụng AI để nâng cao hiệu quả và chất lượng kiểm thử."
+      },
+      "qa": {
+        "title": "QA & QC",
+        "desc": "Phân tích tài liệu, kiểm thử thủ công, API và E2E."
+      },
+      "sql": {
+        "title": "SQL",
+        "desc": "Kiểm thử cơ sở dữ liệu SQL và đảm bảo chất lượng dữ liệu."
+      }
+    },
+    "jobs": {
+      "tripota": {
+        "date": "Tháng 5/2024 - Hiện tại",
+        "role": "QA/QC Engineer",
+        "company": "TripOTA Company",
+        "bullets": [
+          "Phụ trách kiểm thử và đảm bảo chất lượng sản phẩm.",
+          "Tạo và thực thi test case, test plan.",
+          "Tập trung chủ yếu vào E2E testing, API testing và manual testing.",
+          "Nghiên cứu và áp dụng công cụ, framework kiểm thử tự động.",
+          "Triển khai AI workflows để nâng cao hiệu quả kiểm thử."
+        ]
+      },
+      "nfq": {
+        "date": "Tháng 5/2023 - Tháng 5/2024",
+        "role": "Junior .NET Developer",
+        "company": "NFQ Asia",
+        "bullets": [
+          "Phát triển hệ thống API hiệu năng cao bằng .NET Core API với kiến trúc N-Tier.",
+          "Bảo trì và cập nhật codebase để cải thiện hiệu năng và chức năng trong hệ thống ERP.",
+          "Học hỏi và phát triển kỹ năng lập trình viên."
+        ]
+      }
+    },
+    "certs": {
+      "education": {
+        "date": "2019 - 2024",
+        "role": "Kỹ thuật phần mềm",
+        "company": "Đại học Cần Thơ",
+        "desc": "GPA 3.33/4.0."
+      },
+      "toeic": {
+        "role": "TOEIC 735",
+        "company": "IIG Vietnam"
+      },
+      "efset": {
+        "role": "CEFR C2 Proficient",
+        "company": "EF SET"
+      },
+      "aws": {
+        "role": "AWS Build On Vietnam 2021",
+        "company": "Amazon Web Services (AWS)",
+        "desc": "Bán kết. Dự án Vietnam Timo Digital Bank."
+      }
+    }
+  },
+  "login": {
+    "title": "Cổng quản trị",
+    "subtitle": "Đăng nhập để xuất bản và quản lý bài viết",
+    "email": "Địa chỉ email",
+    "emailPlaceholder": "admin@example.com",
+    "password": "Mật khẩu",
+    "signIn": "Đăng nhập",
+    "demoCredentials": "Tài khoản demo:",
+    "errors": {
+      "required": "Vui lòng điền đầy đủ các trường.",
+      "invalid": "Email hoặc mật khẩu không hợp lệ.",
+      "invalidDev": "Email hoặc mật khẩu không hợp lệ. Dùng thông tin bên dưới.",
+      "unavailable": "Đăng nhập admin chưa khả dụng cho đến khi cấu hình Supabase."
+    }
+  },
+  "editor": {
+    "backToDashboard": "Quay lại Dashboard",
+    "editArticle": "Chỉnh sửa bài viết",
+    "createArticle": "Tạo bài viết",
+    "cancel": "Hủy",
+    "savePost": "Lưu bài",
+    "edit": "Soạn thảo",
+    "livePreview": "Xem trước",
+    "title": "Tiêu đề",
+    "titlePlaceholder": "VD: Thiết kế Micro-interactions với CSS",
+    "slug": "Đường dẫn slug",
+    "slugPlaceholder": "VD: thiet-ke-micro-interactions-voi-css",
+    "slugPreview": "Đường dẫn:",
+    "status": "Trạng thái",
+    "draft": "Bản nháp",
+    "published": "Đã xuất bản",
+    "author": "Tác giả",
+    "authorPlaceholder": "Elena Rostova",
+    "coverImage": "URL ảnh bìa (Tùy chọn)",
+    "coverPlaceholder": "https://images.unsplash.com/... hoặc để trống",
+    "tags": "Thẻ (phân cách bằng dấu phẩy)",
+    "tagsPlaceholder": "VD: Design, CSS, UI",
+    "summary": "Tóm tắt (Mô tả ngắn)",
+    "summaryPlaceholder": "Mô tả ngắn nội dung bài viết...",
+    "content": "Nội dung Markdown",
+    "contentPlaceholder": "# Giới thiệu\n\nViết nội dung bài bằng Markdown tại đây...",
+    "previewHeading": "Xem trước Markdown",
+    "previewEmptyTitle": "Bản xem trước sẽ hiển thị tại đây",
+    "previewEmptyDesc": "Điền Tiêu đề, Tóm tắt và nội dung Markdown để xem kết quả render trực tiếp.",
+    "coverPreviewAlt": "Xem trước ảnh bìa",
+    "untitled": "Bài viết chưa có tiêu đề",
+    "by": "Bởi",
+    "justNow": "Vừa xong",
+    "requiredAlert": "Tiêu đề, slug và nội dung là bắt buộc."
+  }
+}

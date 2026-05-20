@@ -1,0 +1,144 @@
+{
+  "header": {
+    "logo": "Jason's Diary",
+    "home": "Home",
+    "about": "About",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "adminLogin": "Admin Login",
+    "logout": "Logout",
+    "toggleTheme": "Toggle theme",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "language": "Language",
+    "subtitle": "This is where I show my portfolio and share my thoughts and experiences about QA/QC and AI."
+  },
+  "footer": {
+    "navigation": "Navigation",
+    "home": "Home",
+    "aboutMe": "About Me",
+    "connect": "Connect",
+    "copyright": "© {{year}} Đỗ Cao Minh. All rights reserved. Powered by React & premium aesthetics."
+  },
+  "about": {
+    "avatarAlt": "Đỗ Cao Minh - Jason",
+    "eyebrow": "Available for Opportunities",
+    "name": "Đỗ Cao Minh - Jason",
+    "title": "QA/QC Engineer",
+    "bio": "I have over 2 years of experience in the QA/QC field, working with AI and automation testing.",
+    "contactMe": "Contact Me",
+    "expertiseSkills": "Expertise & Skills",
+    "experience": "Experience",
+    "educationCredentials": "Education & Credentials",
+    "viewCertificate": "View certificate",
+    "skills": {
+      "ai": {
+        "title": "AI",
+        "desc": "Using AI to improve testing efficiency and effectiveness."
+      },
+      "qa": {
+        "title": "QA & QC",
+        "desc": "Analyst Documentation, Manual testing, API testing and E2E testing."
+      },
+      "sql": {
+        "title": "SQL",
+        "desc": "Testing SQL databases and ensuring the quality of the data."
+      }
+    },
+    "jobs": {
+      "tripota": {
+        "date": "May 2024 - Present",
+        "role": "QA/QC Engineer",
+        "company": "TripOTA Company",
+        "bullets": [
+          "Responsible for testing and ensuring the quality of the product.",
+          "Create and execute test cases and test plans.",
+          "Mainly focus on E2E testing, API testing and manual testing.",
+          "Research and apply automated testing tools and frameworks.",
+          "Implement AI workflows to improve testing efficiency and effectiveness."
+        ]
+      },
+      "nfq": {
+        "date": "May 2023 - May 2024",
+        "role": "Junior .NET Developer",
+        "company": "NFQ Asia",
+        "bullets": [
+          "Developed highly performant API system using .NET Core API with N-Tier architecture.",
+          "Maintained and updated existing codebase to improve performance and functionality in ERP system.",
+          "Learning how to become a developer."
+        ]
+      }
+    },
+    "certs": {
+      "education": {
+        "date": "2019 - 2024",
+        "role": "Software Engineering",
+        "company": "Can Tho University",
+        "desc": "3.33/4.0 GPA."
+      },
+      "toeic": {
+        "role": "TOEIC 735",
+        "company": "IIG Vietnam"
+      },
+      "efset": {
+        "role": "CEFR C2 Proficient",
+        "company": "EF SET"
+      },
+      "aws": {
+        "role": "AWS Build On Vietnam 2021",
+        "company": "Amazon Web Services (AWS)",
+        "desc": "Semifinalist. Vietnam Timo Digital Bank project."
+      }
+    }
+  },
+  "login": {
+    "title": "Admin Portal",
+    "subtitle": "Sign in to publish and manage articles",
+    "email": "Email Address",
+    "emailPlaceholder": "admin@example.com",
+    "password": "Password",
+    "signIn": "Sign In",
+    "demoCredentials": "Demo Credentials:",
+    "errors": {
+      "required": "Please fill in all fields.",
+      "invalid": "Invalid email or password.",
+      "invalidDev": "Invalid email or password. Use credentials shown below.",
+      "unavailable": "Admin login is not available until Supabase is configured."
+    }
+  },
+  "editor": {
+    "backToDashboard": "Back to Dashboard",
+    "editArticle": "Edit Article",
+    "createArticle": "Create Article",
+    "cancel": "Cancel",
+    "savePost": "Save Post",
+    "edit": "Edit",
+    "livePreview": "Live Preview",
+    "title": "Title",
+    "titlePlaceholder": "e.g., Designing Micro-interactions with CSS",
+    "slug": "Slug URL path",
+    "slugPlaceholder": "e.g., designing-micro-interactions-with-css",
+    "slugPreview": "URL path:",
+    "status": "Status",
+    "draft": "Draft",
+    "published": "Published",
+    "author": "Author",
+    "authorPlaceholder": "Elena Rostova",
+    "coverImage": "Cover Image URL (Optional)",
+    "coverPlaceholder": "https://images.unsplash.com/... or leave blank for random",
+    "tags": "Tags (Comma-separated)",
+    "tagsPlaceholder": "e.g., Design, CSS, UI",
+    "summary": "Summary (Brief overview)",
+    "summaryPlaceholder": "Provide a quick overview of what the post covers...",
+    "content": "Markdown Body Content",
+    "contentPlaceholder": "# Introduction\n\nWrite your post body using Markdown here...",
+    "previewHeading": "Live Markdown Preview",
+    "previewEmptyTitle": "Preview will appear here",
+    "previewEmptyDesc": "Start filling out the Title, Summary and Markdown content to see your changes rendered live.",
+    "coverPreviewAlt": "Cover preview",
+    "untitled": "Untitled Article",
+    "by": "By",
+    "justNow": "Just now",
+    "requiredAlert": "Title, slug, and content are required."
+  }
+}
