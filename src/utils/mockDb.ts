@@ -11,6 +11,8 @@ export interface Post {
   author: string;
 }
 
+const MOCK_DATA_VERSION = '5';
+
 const INITIAL_POSTS: Post[] = [
   {
     id: 'post-1',
@@ -48,7 +50,7 @@ Keep reading to see how we implement these details step-by-step in our design sy
     tags: ['Design', 'UX', 'CSS'],
     status: 'published',
     publishedAt: '2026-05-18T10:00:00Z',
-    coverImage: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&q=80&w=1000',
+    coverImage: '',
     author: 'Jason'
   },
   {
@@ -85,7 +87,7 @@ By wrapping complex state updates in a transition, the browser can paint keyfram
     tags: ['React', 'Performance', 'Web Vitals'],
     status: 'published',
     publishedAt: '2026-05-15T14:30:00Z',
-    coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000',
+    coverImage: '',
     author: 'Jason'
   },
   {
@@ -141,7 +143,159 @@ Because these animations are bound natively, browsers can run them on the compos
     tags: ['CSS', 'Animation', 'Performance'],
     status: 'published',
     publishedAt: '2026-05-12T09:15:00Z',
-    coverImage: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1000',
+    coverImage: '',
+    author: 'Jason'
+  },
+  {
+    id: 'post-5',
+    title: 'Playwright Page Object Model: Patterns That Scale in CI',
+    slug: 'playwright-page-object-model-patterns',
+    summary: 'How to structure page objects, fixtures, and locators so your Playwright suite stays maintainable as the product grows.',
+    content: `# Playwright Page Object Model: Patterns That Scale in CI
+
+A Page Object Model (POM) keeps selectors and page actions in one place. When UI changes, you update a single file instead of dozens of specs.
+
+## Keep Page Objects Thin
+Page objects should expose **intent**, not implementation. Prefer \`loginPage.signIn(email, password)\` over chaining ten locators inside every test.
+
+## Use Fixtures for Shared Setup
+Playwright fixtures compose better than deep inheritance. Inject \`homePage\`, \`adminPage\`, and authenticated contexts once, reuse everywhere.`,
+    tags: ['React', 'Performance'],
+    status: 'published',
+    publishedAt: '2026-05-10T08:00:00Z',
+    coverImage: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000',
+    author: 'Jason'
+  },
+  {
+    id: 'post-6',
+    title: 'API Testing Checklist for QA Engineers',
+    slug: 'api-testing-checklist-qa',
+    summary: 'Status codes, schema validation, auth headers, and edge cases — a practical checklist before every release.',
+    content: `# API Testing Checklist for QA Engineers
+
+API tests catch regressions faster than UI alone. Start with happy paths, then boundary values, auth failures, and rate limits.
+
+## Must-Have Assertions
+- Correct HTTP status and response time
+- JSON schema matches contract
+- Error payloads are consistent and documented`,
+    tags: ['Design', 'UX'],
+    status: 'published',
+    publishedAt: '2026-05-08T11:30:00Z',
+    coverImage: '',
+    author: 'Jason'
+  },
+  {
+    id: 'post-7',
+    title: 'Using AI Workflows to Speed Up Test Case Design',
+    slug: 'ai-workflows-test-case-design',
+    summary: 'Pair structured prompts with your product docs to draft test scenarios, then refine with domain knowledge.',
+    content: `# Using AI Workflows to Speed Up Test Case Design
+
+AI does not replace QA judgment — it accelerates drafting. Feed acceptance criteria and user flows into a repeatable prompt template.
+
+## What Works Well
+- Generating boundary-case ideas from requirements
+- Summarizing long specs into test matrices
+- Drafting regression suites after bug fixes`,
+    tags: ['CSS', 'Animation'],
+    status: 'published',
+    publishedAt: '2026-05-06T09:45:00Z',
+    coverImage: '',
+    author: 'Jason'
+  },
+  {
+    id: 'post-8',
+    title: 'Building a Reliable E2E Pipeline with GitHub Actions',
+    slug: 'e2e-pipeline-github-actions',
+    summary: 'Parallel shards, artifact uploads, and flaky-test retries — a CI setup that keeps feedback fast without hiding real failures.',
+    content: `# Building a Reliable E2E Pipeline with GitHub Actions
+
+Run Playwright in CI on every pull request. Cache browsers, shard by project, and upload traces on failure.
+
+## Key Practices
+- Fail fast on lint and unit tests before E2E
+- Store HTML reports and traces as artifacts
+- Quarantine consistently flaky specs instead of silent retries`,
+    tags: ['React', 'Web Vitals'],
+    status: 'published',
+    publishedAt: '2026-05-04T16:00:00Z',
+    coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000',
+    author: 'Jason'
+  },
+  {
+    id: 'post-9',
+    title: 'Finding and Fixing Flaky E2E Tests',
+    slug: 'finding-fixing-flaky-e2e-tests',
+    summary: 'Race conditions, poor locators, and shared test data are the usual suspects. Here is how to diagnose each one.',
+    content: `# Finding and Fixing Flaky E2E Tests
+
+Flaky tests erode trust in CI. Tag unstable specs, run them in isolation, and fix root causes — do not increase retries indefinitely.
+
+## Common Causes
+- Waiting for network instead of UI state
+- Dynamic IDs and nth-child selectors
+- Tests depending on execution order or shared accounts`,
+    tags: ['Performance', 'Web Vitals'],
+    status: 'published',
+    publishedAt: '2026-05-02T10:20:00Z',
+    coverImage: '',
+    author: 'Jason'
+  },
+  {
+    id: 'post-10',
+    title: 'SQL Queries Every QA Engineer Should Know',
+    slug: 'sql-queries-qa-engineers',
+    summary: 'Verify backend state directly: joins, aggregations, and sanity checks that complement your UI and API tests.',
+    content: `# SQL Queries Every QA Engineer Should Know
+
+When UI looks wrong, the database often tells the truth. Learn SELECT with JOIN, COUNT/GROUP BY, and how to spot orphan records.
+
+## Quick Wins
+- Compare row counts before and after a workflow
+- Validate foreign keys after delete operations
+- Snapshot test data fixtures for reproducible bugs`,
+    tags: ['Design', 'CSS'],
+    status: 'published',
+    publishedAt: '2026-04-30T14:00:00Z',
+    coverImage: '',
+    author: 'Jason'
+  },
+  {
+    id: 'post-11',
+    title: 'Manual vs Automated Testing: Choosing the Right Mix',
+    slug: 'manual-vs-automated-testing',
+    summary: 'Exploratory testing still wins for new features; automation wins for regression. A simple framework to decide per scenario.',
+    content: `# Manual vs Automated Testing: Choosing the Right Mix
+
+Automate stable, high-value paths. Keep manual effort for exploratory sessions, usability, and one-off edge cases.
+
+## Rule of Thumb
+If a test runs more than three times per sprint and the UI is stable, candidate it for automation. Otherwise, document and move on.`,
+    tags: ['UX', 'Design'],
+    status: 'published',
+    publishedAt: '2026-04-28T08:30:00Z',
+    coverImage: '',
+    author: 'Jason'
+  },
+  {
+    id: 'post-12',
+    title: 'Writing Bug Reports Developers Actually Love',
+    slug: 'writing-bug-reports-developers-love',
+    summary: 'Repro steps, environment, expected vs actual, and attachments — the template that cuts back-and-forth in half.',
+    content: `# Writing Bug Reports Developers Actually Love
+
+A great bug report saves hours. Include minimal repro steps, browser/OS, screenshots or video, and logs when available.
+
+## Template
+1. Summary (one line)
+2. Steps to reproduce
+3. Expected vs actual
+4. Severity and frequency`,
+    tags: ['CSS', 'Performance'],
+    status: 'published',
+    publishedAt: '2026-04-25T12:00:00Z',
+    coverImage: '',
     author: 'Jason'
   },
   {
@@ -168,14 +322,20 @@ Edge rendering allows server-side HTML to be generated closer to the user, bypas
 ];
 
 export const getPosts = (): Post[] => {
+  const storedVersion = localStorage.getItem('aura_blog_posts_version');
   const posts = localStorage.getItem('aura_blog_posts');
-  if (!posts) {
+
+  if (!posts || storedVersion !== MOCK_DATA_VERSION) {
     localStorage.setItem('aura_blog_posts', JSON.stringify(INITIAL_POSTS));
+    localStorage.setItem('aura_blog_posts_version', MOCK_DATA_VERSION);
     return INITIAL_POSTS;
   }
+
   try {
     return JSON.parse(posts);
   } catch {
+    localStorage.setItem('aura_blog_posts', JSON.stringify(INITIAL_POSTS));
+    localStorage.setItem('aura_blog_posts_version', MOCK_DATA_VERSION);
     return INITIAL_POSTS;
   }
 };

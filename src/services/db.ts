@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { supabase, isMockMode } from '../supabaseClient';
+import { normalizePostTag, postTagKey } from '../utils/postTagUtils';
 
 export interface Post {
   id: string;
@@ -12,6 +13,13 @@ export interface Post {
   is_published?: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface PostTag {
+  id: string;
+  name: string;
+  name_key: string;
+  created_at?: string;
 }
 
 const INITIAL_MOCK_POSTS: Post[] = [
@@ -183,6 +191,16 @@ export const createPost = async (post: Omit<Post, 'id' | 'created_at' | 'updated
         }])
         .select()
         .single();
+
+      if (!error && post.tags?.length) {
+        await registerPostTags(
+          post.tags.map((tag) => ({
+            name: normalizePostTag(tag),
+            name_key: postTagKey(tag),
+          }))
+        );
+      }
+
       return { data: data as Post, error };
     }
   } catch (err: any) {
@@ -221,6 +239,16 @@ export const updatePost = async (id: string, post: Partial<Omit<Post, 'id' | 'cr
         .eq('id', id)
         .select()
         .single();
+
+      if (!error && post.tags?.length) {
+        await registerPostTags(
+          post.tags.map((tag) => ({
+            name: normalizePostTag(tag),
+            name_key: postTagKey(tag),
+          }))
+        );
+      }
+
       return { data: data as Post, error };
     }
   } catch (err: any) {
@@ -245,6 +273,37 @@ export const deletePost = async (id: string): Promise<{ data: { id: string } | n
     }
   } catch (err: any) {
     return { data: null, error: err };
+  }
+};
+
+export const fetchPostTags = async (): Promise<{ data: PostTag[] | null; error: any }> => {
+  try {
+    const { data, error } = await supabase
+      .from('post_tags')
+      .select('*')
+      .order('name', { ascending: true });
+
+    return { data: data as PostTag[], error };
+  } catch (err: any) {
+    return { data: null, error: err };
+  }
+};
+
+export const registerPostTags = async (
+  tags: Array<Pick<PostTag, 'name' | 'name_key'>>
+): Promise<{ error: any }> => {
+  try {
+    if (tags.length === 0) {
+      return { error: null };
+    }
+
+    const { error } = await supabase
+      .from('post_tags')
+      .upsert(tags, { onConflict: 'name_key', ignoreDuplicates: true });
+
+    return { error };
+  } catch (err: any) {
+    return { error: err };
   }
 };
 

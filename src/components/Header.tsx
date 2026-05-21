@@ -61,7 +61,6 @@ export const Header: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => isAdminAuthenticated(user));
 
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -69,11 +68,10 @@ export const Header: React.FC = () => {
     };
 
     window.addEventListener('storage', checkAuth);
-    const interval = setInterval(checkAuth, 1000);
+    checkAuth();
 
     return () => {
       window.removeEventListener('storage', checkAuth);
-      clearInterval(interval);
     };
   }, [user]);
 
@@ -86,23 +84,34 @@ export const Header: React.FC = () => {
   }, [theme]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    let lastScrollY = window.scrollY;
+    let ticking = false;
 
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
+    const handleScroll = () => {
+      if (ticking) {
+        return;
       }
 
-      setLastScrollY(currentScrollY);
+      ticking = true;
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+
+        lastScrollY = currentScrollY;
+        ticking = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [lastScrollY]);
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => {

@@ -19,6 +19,13 @@ dist-ssr
 # Test artifacts
 playwright-report/
 test-results/
+blob-report/
+.playwright-mcp/
+
+# Local dev screenshots (layout/compare captures)
+layout-*.png
+compare-*.png
+*-fixed-*.png
 
 # Editor directories and files
 .vscode/*

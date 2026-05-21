@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { BlogHome } from './pages/BlogHome';
-import { BlogPost } from './pages/BlogPost';
-import { About } from './pages/About';
-import { Login } from './pages/Login';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { AdminEditor } from './pages/AdminEditor';
+
+const BlogPost = lazy(() => import('./pages/BlogPost').then((m) => ({ default: m.BlogPost })));
+const About = lazy(() => import('./pages/About').then((m) => ({ default: m.About })));
+const Login = lazy(() => import('./pages/Login').then((m) => ({ default: m.Login })));
+const AdminDashboard = lazy(() =>
+  import('./pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard })),
+);
+const AdminEditor = lazy(() => import('./pages/AdminEditor').then((m) => ({ default: m.AdminEditor })));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -19,23 +22,29 @@ function ScrollToTop() {
   return null;
 }
 
+function RouteFallback() {
+  return <div className="route-loading" aria-hidden="true" />;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Header />
-        
+
         <div style={{ flex: 1 }}>
-          <Routes>
-            <Route path="/" element={<BlogHome />} />
-            <Route path="/post/:slug" element={<BlogPost />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/new" element={<AdminEditor />} />
-            <Route path="/admin/edit/:id" element={<AdminEditor />} />
-          </Routes>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<BlogHome />} />
+              <Route path="/post/:slug" element={<BlogPost />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/new" element={<AdminEditor />} />
+              <Route path="/admin/edit/:id" element={<AdminEditor />} />
+            </Routes>
+          </Suspense>
         </div>
 
         <Footer />

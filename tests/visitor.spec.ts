@@ -45,14 +45,17 @@ test.describe('Visitor Flow', () => {
     await homePage.goto();
     await expect(homePage.postsList).toBeVisible();
 
+    const initialCount = await homePage.allCards().count();
     await homePage.clickCategory('react');
 
     const filteredCards = homePage.allCards();
-    expect(await filteredCards.count()).toBe(1);
-    await expect(filteredCards.locator('.card-title')).toContainText('React INP');
+    const filteredCount = await filteredCards.count();
+    expect(filteredCount).toBeGreaterThan(0);
+    expect(filteredCount).toBeLessThan(initialCount);
+    await expect(filteredCards.filter({ hasText: 'Optimizing React INP' })).toHaveCount(1);
 
     await homePage.clickCategory('all');
-    expect(await homePage.allCards().count()).toBeGreaterThan(1);
+    expect(await homePage.allCards().count()).toBe(initialCount);
   });
 
   test('should navigate to a post, check detail views, table of contents and back navigation', async ({ homePage }) => {

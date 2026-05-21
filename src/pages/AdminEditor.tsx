@@ -2,11 +2,14 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, Save, Eye, Edit, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Edit, HelpCircle, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getPostById, savePost } from '../utils/mockDb';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
 import { isAdminAuthenticated } from '../utils/adminAuth';
+import { resolvePostCoverImage } from '../utils/generateCoverImage';
+import { registerPostTags } from '../utils/postTags';
+import { PostTagsInput } from '../components/PostTagsInput';
 import './AdminEditor.css';
 
 export const AdminEditor: React.FC = () => {
@@ -15,26 +18,22 @@ export const AdminEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Load post details if editing
   const post = useMemo(() => {
     return id ? getPostById(id) : undefined;
   }, [id]);
 
-  // Form states
   const [title, setTitle] = useState(post?.title || '');
   const [slug, setSlug] = useState(post?.slug || '');
   const [summary, setSummary] = useState(post?.summary || '');
-  const [tagsInput, setTagsInput] = useState(post?.tags.join(', ') || '');
+  const [selectedTags, setSelectedTags] = useState<string[]>(post?.tags || []);
   const [content, setContent] = useState(post?.content || '');
   const [status, setStatus] = useState<'draft' | 'published'>(post?.status || 'draft');
   const [coverImage, setCoverImage] = useState(post?.coverImage || '');
 
-  // Helper flags
   const [isSlugManual, setIsSlugManual] = useState(!!post);
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const [isEditing] = useState(!!post);
 
-  // Auth Guard
   useEffect(() => {
     if (loading) {
       return;
@@ -46,12 +45,10 @@ export const AdminEditor: React.FC = () => {
     }
 
     if (id && !post) {
-      // ID provided but post not found
       navigate('/admin');
     }
   }, [id, loading, navigate, post, user]);
 
-  // Slug auto-generation logic
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
     if (!isSlugManual) {
@@ -68,15 +65,13 @@ export const AdminEditor: React.FC = () => {
     setSlug(newSlug.toLowerCase().replace(/\s+/g, '-'));
   };
 
-  // Convert comma separated tags to array
-  const parsedTags = useMemo(() => {
-    return tagsInput
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
-  }, [tagsInput]);
+  const parsedTags = selectedTags;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const previewCoverImage = useMemo(() => {
+    return resolvePostCoverImage(coverImage, title);
+  }, [coverImage, title]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim() || !content.trim() || !slug.trim()) {
@@ -84,15 +79,18 @@ export const AdminEditor: React.FC = () => {
       return;
     }
 
-    // Default cover image if empty
-    const finalCover = coverImage.trim() || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=1000';
+    const finalCover = resolvePostCoverImage(coverImage, title.trim());
+
+    if (parsedTags.length > 0) {
+      await registerPostTags(parsedTags);
+    }
 
     savePost({
       id,
       title: title.trim(),
       slug: slug.trim(),
       summary: summary.trim() || 'No summary provided.',
-      tags: parsedTags.length > 0 ? parsedTags : ['General'],
+      tags: parsedTags,
       content: content,
       status,
       coverImage: finalCover,
@@ -102,24 +100,32 @@ export const AdminEditor: React.FC = () => {
     navigate('/admin');
   };
 
+  const hasPreviewContent = Boolean(title || content || summary);
+
   return (
-    <div className="container fade-in" style={{ paddingBottom: '5rem' }}>
-      <div className="editor-header">
-        <div>
-          <button
-            onClick={() => navigate('/admin')}
-            className="post-back-btn"
-            style={{ margin: 0 }}
-            data-testid="btn-post-cancel"
-          >
-            <ArrowLeft size={16} /> {t('editor.backToDashboard')}
-          </button>
-          <h1 style={{ marginTop: '0.5rem', marginBottom: 0 }}>
-            {isEditing ? t('editor.editArticle') : t('editor.createArticle')}
-          </h1>
+    <div className="container editor-page fade-in">
+      <nav className="editor-breadcrumb" aria-label="Breadcrumb">
+        <button
+          type="button"
+          onClick={() => navigate('/admin')}
+          className="post-back-btn"
+          data-testid="btn-post-back"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          {t('editor.backToDashboard')}
+        </button>
+     
+      </nav>
+
+      <header className="editor-page-header">
+        <div className="editor-page-header-text">
+          <h1>{isEditing ? t('editor.editArticle') : t('editor.createArticle')}</h1>
+          <p className="editor-page-subtitle">
+            {isEditing ? t('editor.pageSubtitleEdit') : t('editor.pageSubtitleCreate')}
+          </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div className="editor-page-actions">
           <button
             type="button"
             onClick={() => navigate('/admin')}
@@ -129,206 +135,219 @@ export const AdminEditor: React.FC = () => {
             {t('editor.cancel')}
           </button>
           <button
+            type="button"
             onClick={handleSubmit}
             className="btn btn-primary"
             data-testid="btn-post-publish"
           >
-            <Save size={16} /> {t('editor.savePost')}
+            <Save size={16} aria-hidden="true" />
+            {t('editor.savePost')}
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Tab toggle for mobile layouts */}
-      <div className="mobile-tabs-container">
+      <div className="mobile-tabs-container" role="tablist" aria-label={t('editor.livePreview')}>
         <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === 'edit'}
           onClick={() => setMobileTab('edit')}
           className={`mobile-tab-btn ${mobileTab === 'edit' ? 'active' : ''}`}
         >
-          <Edit size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+          <Edit size={14} aria-hidden="true" />
           {t('editor.edit')}
         </button>
         <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === 'preview'}
           onClick={() => setMobileTab('preview')}
           className={`mobile-tab-btn ${mobileTab === 'preview' ? 'active' : ''}`}
         >
-          <Eye size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+          <Eye size={14} aria-hidden="true" />
           {t('editor.livePreview')}
         </button>
       </div>
 
       <div className="editor-container">
-        {/* Editor Form Column */}
         <div className={`editor-pane ${mobileTab !== 'edit' ? 'pane-hidden-mobile' : ''}`}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-title">
-                {t('editor.title')}
-              </label>
-              <input
-                id="post-title"
-                type="text"
-                value={title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder={t('editor.titlePlaceholder')}
-                className="form-input"
-                data-testid="input-post-title"
-                required
-              />
-            </div>
+          <form className="editor-form" onSubmit={handleSubmit}>
+            <section className="editor-form-section" aria-labelledby="editor-section-basics">
+              <h2 id="editor-section-basics" className="editor-section-title">
+                {t('editor.sectionBasics')}
+              </h2>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-slug">
-                {t('editor.slug')}
-              </label>
-              <input
-                id="post-slug"
-                type="text"
-                value={slug}
-                onChange={(e) => handleSlugChange(e.target.value)}
-                placeholder={t('editor.slugPlaceholder')}
-                className="form-input"
-                required
-              />
-              <span className="slug-preview">
-                {t('editor.slugPreview')} <strong>/post/{slug || 'your-slug-here'}</strong>
-              </span>
-            </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="post-title">
+                  {t('editor.title')}
+                </label>
+                <input
+                  id="post-title"
+                  type="text"
+                  value={title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder={t('editor.titlePlaceholder')}
+                  className="form-input"
+                  data-testid="input-post-title"
+                  required
+                />
+              </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-status">
-                {t('editor.status')}
-              </label>
-              <select
-                id="post-status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
-                className="form-select"
-              >
-                <option value="draft">{t('editor.draft')}</option>
-                <option value="published">{t('editor.published')}</option>
-              </select>
-            </div>
+              <div className="editor-form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="post-slug">
+                    {t('editor.slug')}
+                  </label>
+                  <input
+                    id="post-slug"
+                    type="text"
+                    value={slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    placeholder={t('editor.slugPlaceholder')}
+                    className="form-input"
+                    required
+                  />
+                  <p className="slug-preview">
+                    {t('editor.slugPreview')} <strong>/post/{slug || 'your-slug-here'}</strong>
+                  </p>
+                </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-cover">
-                {t('editor.coverImage')}
-              </label>
-              <input
-                id="post-cover"
-                type="url"
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder={t('editor.coverPlaceholder')}
-                className="form-input"
-              />
-            </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="post-status">
+                    {t('editor.status')}
+                  </label>
+                  <div className="editor-select-wrap">
+                    <select
+                      id="post-status"
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
+                      className="form-select"
+                    >
+                      <option value="draft">{t('editor.draft')}</option>
+                      <option value="published">{t('editor.published')}</option>
+                    </select>
+                    <ChevronDown size={18} className="editor-select-icon" aria-hidden="true" />
+                  </div>
+                </div>
+              </div>
+            </section>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-tags">
-                {t('editor.tags')}
-              </label>
-              <input
-                id="post-tags"
-                type="text"
-                value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
-                placeholder={t('editor.tagsPlaceholder')}
-                className="form-input"
-                data-testid="input-post-tags"
-              />
-            </div>
+            <section className="editor-form-section" aria-labelledby="editor-section-media">
+              <h2 id="editor-section-media" className="editor-section-title">
+                {t('editor.sectionMedia')}
+              </h2>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-summary">
-                {t('editor.summary')}
-              </label>
-              <textarea
-                id="post-summary"
-                rows={3}
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                placeholder={t('editor.summaryPlaceholder')}
-                className="form-textarea"
-                style={{ resize: 'vertical' }}
-              />
-            </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="post-cover">
+                  {t('editor.coverImage')}
+                </label>
+                <input
+                  id="post-cover"
+                  type="url"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder={t('editor.coverPlaceholder')}
+                  className="form-input"
+                />
+              </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="post-content">
-                {t('editor.content')}
-              </label>
-              <textarea
-                id="post-content"
-                rows={15}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder={t('editor.contentPlaceholder')}
-                className="form-textarea"
-                style={{ resize: 'vertical', fontFamily: 'monospace', fontSize: '0.875rem' }}
-                data-testid="textarea-post-content"
-                required
-              />
-            </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="post-tags">
+                  {t('editor.tags')}
+                </label>
+                <PostTagsInput
+                  id="post-tags"
+                  value={selectedTags}
+                  onChange={setSelectedTags}
+                />
+              </div>
+            </section>
+
+            <section className="editor-form-section" aria-labelledby="editor-section-content">
+              <h2 id="editor-section-content" className="editor-section-title">
+                {t('editor.sectionContent')}
+              </h2>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="post-summary">
+                  {t('editor.summary')}
+                </label>
+                <textarea
+                  id="post-summary"
+                  rows={3}
+                  value={summary}
+                  onChange={(e) => setSummary(e.target.value)}
+                  placeholder={t('editor.summaryPlaceholder')}
+                  className="form-textarea"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="post-content">
+                  {t('editor.content')}
+                </label>
+                <textarea
+                  id="post-content"
+                  rows={15}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder={t('editor.contentPlaceholder')}
+                  className="form-textarea editor-content-textarea"
+                  data-testid="textarea-post-content"
+                  required
+                />
+              </div>
+            </section>
           </form>
         </div>
 
-        {/* Live Preview Column */}
-        <div className={`preview-pane ${mobileTab !== 'preview' ? 'pane-hidden-mobile' : ''}`}>
-          <h2 style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <Eye size={14} /> {t('editor.previewHeading')}
+        <aside className={`preview-pane ${mobileTab !== 'preview' ? 'pane-hidden-mobile' : ''}`}>
+          <h2 className="preview-pane-header">
+            <Eye size={14} aria-hidden="true" />
+            {t('editor.previewHeading')}
           </h2>
 
-          {!title && !content && !summary ? (
+          {!hasPreviewContent ? (
             <div className="preview-empty-state">
-              <HelpCircle size={40} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+              <HelpCircle size={40} aria-hidden="true" />
               <h4>{t('editor.previewEmptyTitle')}</h4>
               <p>{t('editor.previewEmptyDesc')}</p>
             </div>
           ) : (
-            <div>
-              {coverImage && (
-                <div style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '1.5rem', maxHeight: '200px', border: '1px solid var(--color-border)' }}>
-                  <img
-                    src={coverImage}
-                    alt={t('editor.coverPreviewAlt')}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=1000';
-                    }}
-                  />
+            <article>
+              <div className="preview-cover">
+                <img
+                  src={previewCoverImage}
+                  alt={t('editor.coverPreviewAlt')}
+                />
+              </div>
+
+              {parsedTags.length > 0 && (
+                <div className="preview-tags">
+                  {parsedTags.map((tag) => (
+                    <span key={tag} className="post-tag">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-                {parsedTags.map((tag) => (
-                  <span key={tag} className="post-tag">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              <h1 className="preview-title">{title || t('editor.untitled')}</h1>
 
-              <h1 style={{ fontSize: '1.875rem', marginBottom: '0.5rem', color: 'var(--color-text-highlight)' }}>
-                {title || t('editor.untitled')}
-              </h1>
-
-              <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
+              <div className="preview-meta">
                 <span>{t('editor.by')} {SITE_AUTHOR.name}</span>
-                <span>•</span>
+                <span aria-hidden="true">•</span>
                 <span>{t('editor.justNow')}</span>
               </div>
 
-              {summary && (
-                <div style={{ fontStyle: 'italic', borderLeft: '3px solid var(--color-border)', paddingLeft: '1rem', color: 'var(--color-text-muted)', marginBottom: '2rem' }}>
-                  {summary}
-                </div>
-              )}
+              {summary && <p className="preview-summary">{summary}</p>}
 
               <div className="markdown-body">
                 <ReactMarkdown>{content}</ReactMarkdown>
               </div>
-            </div>
+            </article>
           )}
-        </div>
+        </aside>
       </div>
     </div>
   );

@@ -1,0 +1,108 @@
+.post-tags-input {
+  position: relative;
+}
+
+.post-tags-input-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  cursor: text;
+  transition: border-color var(--transition-fast);
+}
+
+.post-tags-input-field:focus-within {
+  border-color: var(--color-accent);
+  outline: 2px solid rgba(14, 165, 233, 0.15);
+  outline-offset: 1px;
+}
+
+.post-tags-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-highlight);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.post-tags-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.post-tags-chip-remove:hover {
+  color: var(--color-text-highlight);
+}
+
+.post-tags-text-input {
+  flex: 1;
+  min-width: 8rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  padding: 0.25rem 0.15rem;
+}
+
+.post-tags-text-input:focus {
+  outline: none;
+}
+
+.post-tags-text-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.post-tags-dropdown {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.post-tags-option {
+  padding: 0.55rem 0.75rem;
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.post-tags-option.is-active,
+.post-tags-option:hover {
+  background-color: var(--color-bg-muted);
+}
+
+.post-tags-option-create {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.post-tags-option-empty {
+  color: var(--color-text-muted);
+  cursor: default;
+}

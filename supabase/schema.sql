@@ -63,3 +63,28 @@ CREATE POLICY "Allow authenticated delete access"
 ON public.posts
 FOR DELETE
 USING (auth.role() = 'authenticated');
+
+-- 4. Post tags registry (admin autocomplete)
+CREATE TABLE IF NOT EXISTS public.post_tags (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    name_key TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    CONSTRAINT post_tags_name_key_unique UNIQUE (name_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_post_tags_name ON public.post_tags(name);
+
+ALTER TABLE public.post_tags ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow authenticated read access to post tags" ON public.post_tags;
+CREATE POLICY "Allow authenticated read access to post tags"
+ON public.post_tags
+FOR SELECT
+USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Allow authenticated insert access to post tags" ON public.post_tags;
+CREATE POLICY "Allow authenticated insert access to post tags"
+ON public.post_tags
+FOR INSERT
+WITH CHECK (auth.role() = 'authenticated');

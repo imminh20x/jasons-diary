@@ -3,8 +3,33 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft } from 'lucide-react';
 import { getPostBySlug } from '../utils/mockDb';
+import { getOptimizedCoverImage } from '../utils/imageUrl';
+import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
 import './BlogPost.css';
+
+// Helper function to recursively extract text content from React nodes
+const getInnerText = (node: any): string => {
+  if (!node) return '';
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(getInnerText).join('');
+  if (node.props && node.props.children) return getInnerText(node.props.children);
+  return '';
+};
+
+// Custom components for ReactMarkdown to inject heading IDs and custom styles
+const markdownComponents = {
+  h2: ({ ...props }: any) => {
+    const childrenText = getInnerText(props.children);
+    const id = childrenText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return <h2 id={id} {...props} />;
+  },
+  h3: ({ ...props }: any) => {
+    const childrenText = getInnerText(props.children);
+    const id = childrenText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return <h3 id={id} {...props} />;
+  },
+};
 
 export const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -97,20 +122,6 @@ export const BlogPost: React.FC = () => {
     );
   }
 
-  // Custom components for ReactMarkdown to inject heading IDs and custom styles
-  const markdownComponents = {
-    h2: ({ ...props }) => {
-      const childrenText = String(props.children || '');
-      const id = childrenText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      return <h2 id={id} {...props} />;
-    },
-    h3: ({ ...props }) => {
-      const childrenText = String(props.children || '');
-      const id = childrenText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      return <h3 id={id} {...props} />;
-    },
-  };
-
   return (
     <div className="fade-in post-detail-page">
       {/* 1. Full-width Banner Header */}
@@ -131,6 +142,9 @@ export const BlogPost: React.FC = () => {
                 src={SITE_AUTHOR.avatar}
                 alt={SITE_AUTHOR.name}
                 className="author-avatar"
+                width="32"
+                height="32"
+                decoding="async"
               />
               <div className="author-meta">
                 <span className="author-name">{SITE_AUTHOR.name}</span>
@@ -141,7 +155,14 @@ export const BlogPost: React.FC = () => {
           </div>
           <div className="post-header-cover">
             <div className="post-cover-wrapper">
-              <img src={post.coverImage} alt={post.title} />
+              <img
+                src={getOptimizedCoverImage(resolvePostCoverImage(post.coverImage, post.title), 800)}
+                alt={post.title}
+                fetchPriority="high"
+                decoding="async"
+                width="800"
+                height="500"
+              />
             </div>
           </div>
         </div>

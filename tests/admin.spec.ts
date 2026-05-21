@@ -7,6 +7,7 @@ test.describe('Admin Flow', () => {
     await page.evaluate(() => {
       window.localStorage.removeItem('admin_authenticated');
       window.localStorage.removeItem('aura_blog_posts'); // Reset mock database
+      window.localStorage.removeItem('aura_blog_post_tags');
     });
   });
 
@@ -52,7 +53,7 @@ test.describe('Admin Flow', () => {
 
     // 2. Check preview rendering
     await editPostPage.contentInput.fill('## Subheading\nThis is **bold** text.');
-    await editPostPage.tagsInput.fill('Playwright, E2E');
+    await editPostPage.fillTags('Playwright, E2E');
     
     // Preview should display the title and content
     await expect(editPostPage.previewPane.getByRole('heading', { name: 'Playwright Test Article' })).toBeVisible();

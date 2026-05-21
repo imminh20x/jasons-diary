@@ -80,4 +80,17 @@ if (storageError) {
 }
 
 console.log('✓  Supabase connection successful (posts table reachable).');
+
+const { error: postTagsError } = await supabase.from('post_tags').select('id').limit(1);
+
+if (postTagsError) {
+  if (postTagsError.code === 'PGRST205' || postTagsError.message?.includes('post_tags')) {
+    console.warn('⚠  Table "post_tags" not found. Re-run supabase/schema.sql in the SQL Editor.');
+  } else {
+    console.warn('⚠  post_tags check skipped:', postTagsError.message);
+  }
+} else {
+  console.log('→ Table "post_tags": OK');
+}
+
 console.log('   Restart dev server (npm run dev) so Vite picks up .env changes.');

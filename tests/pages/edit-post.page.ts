@@ -20,10 +20,23 @@ export class EditPostPage {
     this.previewPane = page.locator('.preview-pane');
   }
 
-  async fillPostDetails(title: string, content: string, tags: string, status?: string) {
+  async fillTags(tags: string | string[]) {
+    const tagList = typeof tags === 'string'
+      ? tags.split(',').map((tag) => tag.trim()).filter(Boolean)
+      : tags;
+
+    for (const tag of tagList) {
+      await this.tagsInput.fill(tag);
+      await this.tagsInput.press('Enter');
+    }
+  }
+
+  async fillPostDetails(title: string, content: string, tags?: string | string[], status?: string) {
     await this.titleInput.fill(title);
     await this.contentInput.fill(content);
-    await this.tagsInput.fill(tags);
+    if (tags) {
+      await this.fillTags(tags);
+    }
     if (status) {
       await this.statusSelect.selectOption(status);
     }

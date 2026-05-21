@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ArrowRight, BookOpen } from 'lucide-react';
 import { getPosts } from '../utils/mockDb';
+import { getOptimizedCoverImage } from '../utils/imageUrl';
+import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import './BlogHome.css';
 import { t } from 'i18next';
-import { SITE_AUTHOR } from '../constants/siteAuthor';
 
 export const BlogHome: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,7 +31,7 @@ export const BlogHome: React.FC = () => {
       const matchesSearch =
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchQuery.toLowerCase());
+        post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesTag = selectedTag === 'All' || post.tags.includes(selectedTag);
 
@@ -77,41 +78,45 @@ export const BlogHome: React.FC = () => {
       {/* Hero Banner Section */}
       <section className="home-hero">
         <div className="ambient-glow" />
-        <h1 className="home-title">Jason's Diary</h1>
-        <p className="home-subtitle">
-          {t('header.subtitle')}
-        </p>
+        <div className="container">
+          <div className="home-hero-inner">
+            <h1 className="home-title">Jason's Diary</h1>
+            <p className="home-subtitle">
+              {t('header.subtitle')}
+            </p>
 
-        {/* Categories Pills */}
-        <div className="category-pills-container" role="tablist" aria-label="Filter posts by category">
-          {tags.map((tag) => (
-            <button
-              key={tag}
-              role="tab"
-              aria-selected={selectedTag === tag}
-              onClick={() => setSelectedTag(tag)}
-              className={`category-pill ${selectedTag === tag ? 'active' : ''}`}
-              data-testid={tag === 'All' ? 'category-pill-all' : `category-pill-${tag.toLowerCase()}`}
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
+            {/* Categories Pills */}
+            <div className="category-pills-container" role="tablist" aria-label="Filter posts by category">
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  role="tab"
+                  aria-selected={selectedTag === tag}
+                  onClick={() => setSelectedTag(tag)}
+                  className={`category-pill ${selectedTag === tag ? 'active' : ''}`}
+                  data-testid={tag === 'All' ? 'category-pill-all' : `category-pill-${tag.toLowerCase()}`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
 
-        {/* Centered Search Bar */}
-        <div className="search-wrapper">
-          <form role="search" onSubmit={(e) => e.preventDefault()} className="search-form">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-              data-testid="input-search"
-              aria-label="Search articles"
-            />
-          </form>
+            {/* Centered Search Bar */}
+            <div className="search-wrapper">
+              <form role="search" onSubmit={(e) => e.preventDefault()} className="search-form">
+                <Search size={18} className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                  data-testid="input-search"
+                  aria-label="Search articles"
+                />
+              </form>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -138,9 +143,10 @@ export const BlogHome: React.FC = () => {
                     <div className="more-img-wrapper">
                       <Link to={`/post/${post.slug}`}>
                         <img
-                          src={post.coverImage}
+                          src={getOptimizedCoverImage(resolvePostCoverImage(post.coverImage, post.title), 400)}
                           alt={post.title}
                           loading="lazy"
+                          decoding="async"
                           width="400"
                           height="250"
                         />
@@ -177,12 +183,14 @@ export const BlogHome: React.FC = () => {
             {/* 1. Featured Post */}
             {featuredPost && (
               <div className="featured-section">
-                <div className="featured-card" data-testid={`card-post-${featuredPost.id}`}>
+                <div className="card featured-card" data-testid={`card-post-${featuredPost.id}`}>
                   <div className="featured-img-wrapper">
                     <Link to={`/post/${featuredPost.slug}`}>
                       <img
-                        src={featuredPost.coverImage}
+                        src={getOptimizedCoverImage(resolvePostCoverImage(featuredPost.coverImage, featuredPost.title), 800)}
                         alt={featuredPost.title}
+                        fetchPriority="high"
+                        decoding="async"
                         width="800"
                         height="500"
                       />
@@ -196,14 +204,7 @@ export const BlogHome: React.FC = () => {
                     <p className="featured-summary">{featuredPost.summary}</p>
                     <div className="featured-footer">
                       <div className="featured-author-row">
-                        <img
-                          src={SITE_AUTHOR.avatar}
-                          alt={SITE_AUTHOR.name}
-                          className="author-avatar"
-                        />
                         <div className="author-meta">
-                          <span className="author-name">{SITE_AUTHOR.name}</span>
-                          <span className="post-meta-divider">·</span>
                           <span className="publish-date">{formatDate(featuredPost.publishedAt)}</span>
                         </div>
                       </div>
@@ -228,11 +229,12 @@ export const BlogHome: React.FC = () => {
                         <div className="latest-img-wrapper">
                           <Link to={`/post/${post.slug}`}>
                             <img
-                              src={post.coverImage}
+                              src={getOptimizedCoverImage(resolvePostCoverImage(post.coverImage, post.title), 640)}
                               alt={post.title}
-                              width="800"
-                              height="500"
+                              width="640"
+                              height="400"
                               loading="lazy"
+                              decoding="async"
                             />
                           </Link>
                         </div>
@@ -247,14 +249,7 @@ export const BlogHome: React.FC = () => {
                           </h5>
                           <p className="latest-summary">{post.summary}</p>
                           <div className="latest-author-row">
-                            <img
-                              src={SITE_AUTHOR.avatar}
-                              alt={SITE_AUTHOR.name}
-                              className="author-avatar"
-                            />
                             <div className="author-meta flex-1">
-                              <span className="author-name">{SITE_AUTHOR.name}</span>
-                              <span className="post-meta-divider">·</span>
                               <span className="publish-date">{formatDate(post.publishedAt)}</span>
                             </div>
                           </div>
@@ -278,11 +273,12 @@ export const BlogHome: React.FC = () => {
                         <div className="more-img-wrapper">
                           <Link to={`/post/${post.slug}`}>
                             <img
-                              src={post.coverImage}
+                              src={getOptimizedCoverImage(resolvePostCoverImage(post.coverImage, post.title), 400)}
                               alt={post.title}
                               width="400"
                               height="250"
                               loading="lazy"
+                              decoding="async"
                             />
                           </Link>
                         </div>
@@ -302,7 +298,6 @@ export const BlogHome: React.FC = () => {
                               className="read-more-link"
                               data-testid={`link-read-more-${post.id}`}
                             >
-                              Read Article <ArrowRight size={14} />
                             </Link>
                           </div>
                         </div>

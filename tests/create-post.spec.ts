@@ -7,6 +7,7 @@ test.describe('Create Blog Post Flow E2E', () => {
     await page.evaluate(() => {
       window.localStorage.removeItem('admin_authenticated');
       window.localStorage.removeItem('aura_blog_posts');
+      window.localStorage.removeItem('aura_blog_post_tags');
     });
 
     // 2. Log in
