@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mail, Briefcase, Award, GraduationCap, ArrowUpRight } from 'lucide-react';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
+import { SITE_CONTACT, contactEmailHref, hasContactEmail } from '../constants/siteContact';
 import './About.css';
 
 const GithubIcon = () => (
@@ -66,11 +67,14 @@ export const About: React.FC = () => {
             <p className="about-bio">{t('about.bio')}</p>
 
             <div className="about-actions-row">
-              <a href="mailto:imminh20x@gmail.com" className="btn btn-primary" data-testid="btn-contact-email">
+              {hasContactEmail() && (
+              <a href={contactEmailHref()} className="btn btn-primary" data-testid="btn-contact-email">
                 <Mail size={16} /> {t('about.contactMe')}
               </a>
+              )}
+              {SITE_CONTACT.github && (
               <a
-                href="https://github.com/imminh20x"
+                href={SITE_CONTACT.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
@@ -78,8 +82,10 @@ export const About: React.FC = () => {
               >
                 <GithubIcon /> GitHub <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
               </a>
+              )}
+              {SITE_CONTACT.linkedin && (
               <a
-                href="https://linkedin.com/in/imminh20x"
+                href={SITE_CONTACT.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
@@ -87,6 +93,7 @@ export const About: React.FC = () => {
               >
                 <LinkedinIcon /> LinkedIn <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
               </a>
+              )}
             </div>
           </div>
         </div>

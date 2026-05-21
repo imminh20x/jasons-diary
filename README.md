@@ -107,14 +107,19 @@ Admin routes: `/login` → `/admin` → `/admin/new`
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Run SQL in the dashboard (**SQL Editor**):
-   - `supabase/schema.sql` — `posts`, `post_tags`, RLS policies
-   - `supabase/storage.sql` — `blog-images` bucket
+   - Edit `supabase/schema.sql` → set `REPLACE_WITH_ADMIN_EMAIL` to your admin email
+   - Run `supabase/schema.sql` — `posts`, `post_tags`, RLS policies
+   - Run `supabase/storage.sql` — `blog-images` bucket
 3. Create an admin user: **Authentication → Users → Add user**
-4. Fill in `.env`:
+4. Fill in `.env` (copy from `.env.example`):
 
 ```env
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-api-key
+VITE_CONTACT_EMAIL=you@example.com
+VITE_CONTACT_PHONE=+10000000000
+VITE_GITHUB_URL=https://github.com/your-username
+VITE_LINKEDIN_URL=https://linkedin.com/in/your-username
 ```
 
 5. Verify connection:
@@ -178,10 +183,27 @@ Test suites:
 
 1. Push to GitHub
 2. Import the repo in [Vercel](https://vercel.com)
-3. Add environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) if using Supabase
+3. Add environment variables in Vercel (see `.env.example` and [SECURITY.md](./SECURITY.md))
 4. Deploy — `vercel.json` handles SPA routing
 
 Without Supabase env vars on Vercel, the production site runs in mock mode (localStorage per browser — not suitable for a real multi-user CMS).
+
+---
+
+## Security & data isolation
+
+**Cloning this repo does not access the original author's live data.**
+
+- Secrets and personal contact info live in `.env` / Vercel env vars (gitignored), not in source code.
+- Mock mode stores posts in **each visitor's browser** (`localStorage`) — fully isolated per clone.
+- Supabase mode requires **your own** project URL, anon key, and admin user.
+- RLS restricts write access to a single admin email configured in `supabase/schema.sql`.
+
+See **[SECURITY.md](./SECURITY.md)** for the full checklist.
+
+```bash
+npm run check:secrets   # scan tracked files for known sensitive patterns
+```
 
 ---
 

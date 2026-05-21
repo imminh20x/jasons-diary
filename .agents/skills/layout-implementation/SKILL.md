@@ -356,8 +356,8 @@ export const Footer = () => {
           <div className="footer-logo">AuraLog</div>
           <p className="footer-desc">Sharing thoughts and automation QA guidelines.</p>
           <div className="footer-contact-info">
-            <a href="mailto:imminh20x@gmail.com" data-testid="footer-email">imminh20x@gmail.com</a>
-            <a href="tel:+84899690883" data-testid="footer-phone">+84 899 690 883</a>
+            <a href="mailto:you@example.com" data-testid="footer-email">you@example.com</a>
+            <a href="tel:+10000000000" data-testid="footer-phone">+1 000 000 0000</a>
           </div>
         </div>
         <div className="footer-col-links">
@@ -368,8 +368,8 @@ export const Footer = () => {
         <div className="footer-col-social">
           <h4>Connect</h4>
           <div className="social-icons">
-            <a href="https://github.com/imminh20x" data-testid="footer-social-github">GitHub</a>
-            <a href="https://linkedin.com/in/imminh20x" data-testid="footer-social-linkedin">LinkedIn</a>
+            <a href="https://github.com/your-username" data-testid="footer-social-github">GitHub</a>
+            <a href="https://linkedin.com/in/your-username" data-testid="footer-social-linkedin">LinkedIn</a>
           </div>
         </div>
       </div>

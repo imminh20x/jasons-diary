@@ -16,6 +16,12 @@ dist-ssr
 .env.*
 !.env.example
 
+# Secrets & credentials
+*.pem
+*.key
+credentials.json
+service-account*.json
+
 # Test artifacts
 playwright-report/
 test-results/

@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const testPublicEnv = {
+  VITE_CONTACT_EMAIL: 'you@example.com',
+  VITE_CONTACT_PHONE: '+10000000000',
+  VITE_GITHUB_URL: 'https://github.com/your-username',
+  VITE_LINKEDIN_URL: 'https://linkedin.com/in/your-username',
+};
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -18,6 +25,10 @@ export default defineConfig({
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 10000,
+    env: {
+      ...process.env,
+      ...testPublicEnv,
+    },
   },
   projects: [
     {

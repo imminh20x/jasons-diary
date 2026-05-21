@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Feather, Mail } from 'lucide-react';
+import { SITE_CONTACT, contactEmailHref, contactPhoneHref, hasContactEmail, hasContactPhone } from '../constants/siteContact';
 import './Footer.css';
 
 const GithubIcon = () => (
@@ -84,14 +85,18 @@ export const Footer: React.FC = () => {
           </Link>
           <p className="footer-description">{t('header.subtitle')}</p>
           <div className="footer-contact-details">
-            <a href="mailto:imminh20x@gmail.com" className="footer-contact-item" data-testid="footer-email">
-              <Mail size={14} />
-              <span>imminh20x@gmail.com</span>
-            </a>
-            <a href="tel:+84899690883" className="footer-contact-item" data-testid="footer-phone">
-              <PhoneIcon />
-              <span>+84 899 690 883</span>
-            </a>
+            {hasContactEmail() && (
+              <a href={contactEmailHref()} className="footer-contact-item" data-testid="footer-email">
+                <Mail size={14} />
+                <span>{SITE_CONTACT.email}</span>
+              </a>
+            )}
+            {hasContactPhone() && (
+              <a href={contactPhoneHref()} className="footer-contact-item" data-testid="footer-phone">
+                <PhoneIcon />
+                <span>{SITE_CONTACT.phone}</span>
+              </a>
+            )}
           </div>
         </div>
 
@@ -110,8 +115,9 @@ export const Footer: React.FC = () => {
         <div className="footer-social-col">
           <h4 className="footer-title">{t('footer.connect')}</h4>
           <div className="footer-social-links">
+            {SITE_CONTACT.github && (
             <a
-              href="https://github.com/imminh20x"
+              href={SITE_CONTACT.github}
               target="_blank"
               rel="noopener noreferrer"
               className="footer-social-btn"
@@ -120,8 +126,10 @@ export const Footer: React.FC = () => {
             >
               <GithubIcon />
             </a>
+            )}
+            {SITE_CONTACT.linkedin && (
             <a
-              href="https://linkedin.com/in/imminh20x"
+              href={SITE_CONTACT.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               className="footer-social-btn"
@@ -130,8 +138,10 @@ export const Footer: React.FC = () => {
             >
               <LinkedinIcon />
             </a>
+            )}
+            {SITE_CONTACT.facebook && (
             <a
-              href="https://facebook.com/dcaomnh"
+              href={SITE_CONTACT.facebook}
               target="_blank"
               rel="noopener noreferrer"
               className="footer-social-btn"
@@ -140,6 +150,7 @@ export const Footer: React.FC = () => {
             >
               <FacebookIcon />
             </a>
+            )}
           </div>
         </div>
       </div>

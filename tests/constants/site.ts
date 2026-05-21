@@ -3,8 +3,8 @@ export const SITE = {
   authorName: 'Đỗ Cao Minh - Jason',
   authorShortName: 'Jason',
   authorTitle: 'QA/QC Engineer',
-  email: 'mailto:imminh20x@gmail.com',
-  phone: 'tel:+84899690883',
-  github: 'https://github.com/imminh20x',
-  linkedin: 'https://linkedin.com/in/imminh20x',
+  email: 'mailto:you@example.com',
+  phone: 'tel:+10000000000',
+  github: 'https://github.com/your-username',
+  linkedin: 'https://linkedin.com/in/your-username',
 } as const;
