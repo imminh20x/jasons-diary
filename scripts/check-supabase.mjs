@@ -1,6 +1,5 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { createClient } from '@supabase/supabase-js';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const ENV_PATH = resolve(ROOT, '.env');
@@ -34,6 +33,32 @@ function isPlaceholder(value) {
   return PLACEHOLDER_PATTERNS.some((p) => lower.includes(p));
 }
 
+function supabaseHeaders(anonKey) {
+  return {
+    apikey: anonKey,
+    Authorization: `Bearer ${anonKey}`,
+  };
+}
+
+async function queryTable(baseUrl, anonKey, table) {
+  const response = await fetch(`${baseUrl}/rest/v1/${table}?select=id&limit=1`, {
+    headers: supabaseHeaders(anonKey),
+  });
+
+  if (response.ok) {
+    return { ok: true };
+  }
+
+  let body = {};
+  try {
+    body = await response.json();
+  } catch {
+    body = { message: await response.text() };
+  }
+
+  return { ok: false, status: response.status, body };
+}
+
 const fileEnv = loadEnvFile(ENV_PATH);
 const url = process.env.VITE_SUPABASE_URL ?? fileEnv.VITE_SUPABASE_URL;
 const anonKey = process.env.VITE_SUPABASE_ANON_KEY ?? fileEnv.VITE_SUPABASE_ANON_KEY;
@@ -52,42 +77,49 @@ if (isPlaceholder(url) || isPlaceholder(anonKey)) {
 
 console.log(`→ Project URL: ${url}`);
 
-const supabase = createClient(url, anonKey);
+const postsResult = await queryTable(url, anonKey, 'posts');
 
-const { error: postsError } = await supabase.from('posts').select('id').limit(1);
-
-if (postsError) {
-  if (postsError.code === 'PGRST205' || postsError.message?.includes('posts')) {
+if (!postsResult.ok) {
+  if (postsResult.body?.code === 'PGRST205' || postsResult.body?.message?.includes('posts')) {
     console.error('✗  Connected, but table "posts" not found.');
     console.error('   Run supabase/schema.sql in the Supabase SQL Editor.');
+  } else if (postsResult.status === 401 || postsResult.status === 403) {
+    console.error('✗  Auth failed. Check VITE_SUPABASE_ANON_KEY in .env.');
+    console.error('   ', postsResult.body?.message ?? postsResult.status);
   } else {
-    console.error('✗  Database error:', postsError.message);
+    console.error('✗  Database error:', postsResult.body?.message ?? postsResult.status);
   }
   process.exit(1);
 }
 
-const { data: buckets, error: storageError } = await supabase.storage.listBuckets();
+// Anon key cannot list all buckets (GET /storage/v1/bucket returns []).
+// Probe the specific bucket via object list instead.
+const bucketResponse = await fetch(`${url}/storage/v1/object/list/blog-images`, {
+  method: 'POST',
+  headers: {
+    ...supabaseHeaders(anonKey),
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ prefix: '', limit: 1, offset: 0 }),
+});
 
-if (storageError) {
-  console.warn('⚠  Storage check skipped:', storageError.message);
+if (bucketResponse.status === 404) {
+  console.warn('⚠  Bucket "blog-images" not found. Run supabase/storage.sql.');
+} else if (!bucketResponse.ok) {
+  console.warn('⚠  Storage check skipped:', bucketResponse.status, await bucketResponse.text());
 } else {
-  const hasBlogImages = buckets?.some((b) => b.name === 'blog-images' || b.id === 'blog-images');
-  if (!hasBlogImages) {
-    console.warn('⚠  Bucket "blog-images" not found. Run supabase/storage.sql.');
-  } else {
-    console.log('→ Storage bucket "blog-images": OK');
-  }
+  console.log('→ Storage bucket "blog-images": OK');
 }
 
 console.log('✓  Supabase connection successful (posts table reachable).');
 
-const { error: postTagsError } = await supabase.from('post_tags').select('id').limit(1);
+const postTagsResult = await queryTable(url, anonKey, 'post_tags');
 
-if (postTagsError) {
-  if (postTagsError.code === 'PGRST205' || postTagsError.message?.includes('post_tags')) {
+if (!postTagsResult.ok) {
+  if (postTagsResult.body?.code === 'PGRST205' || postTagsResult.body?.message?.includes('post_tags')) {
     console.warn('⚠  Table "post_tags" not found. Re-run supabase/schema.sql in the SQL Editor.');
   } else {
-    console.warn('⚠  post_tags check skipped:', postTagsError.message);
+    console.warn('⚠  post_tags check skipped:', postTagsResult.body?.message ?? postTagsResult.status);
   }
 } else {
   console.log('→ Table "post_tags": OK');
