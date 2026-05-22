@@ -4,6 +4,7 @@
     "home": "Trang chủ",
     "about": "Giới thiệu",
     "dashboard": "Bảng điều khiển",
+    "admin": "Admin",
     "adminLogin": "Đăng nhập Admin",
     "logout": "Đăng xuất",
     "toggleTheme": "Đổi giao diện",
@@ -14,7 +15,53 @@
   },
   "footer": {
     "navigation": "Điều hướng",
-    "connect": "Kết nối"
+    "home": "Trang chủ",
+    "aboutMe": "Giới thiệu",
+    "connect": "Kết nối",
+    "copyright": "© {{year}} Đỗ Cao Minh. Bảo lưu mọi quyền. Xây dựng bằng React & thẩm mỹ tinh gọn."
+  },
+  "home": {
+    "filterAriaLabel": "Lọc bài viết theo thể loại",
+    "allTags": "Tất cả",
+    "searchPlaceholder": "Tìm kiếm...",
+    "searchAriaLabel": "Tìm kiếm bài viết",
+    "results": "Kết quả ({{count}})",
+    "emptyTitle": "Không tìm thấy bài viết",
+    "emptyDesc": "Thử đặt lại bộ lọc thẻ hoặc tìm với từ khóa khác.",
+    "featured": "Nổi bật",
+    "latest": "Mới nhất",
+    "moreArticles": "Thêm bài viết",
+    "readArticle": "Đọc bài"
+  },
+  "post": {
+    "notFoundTitle": "Không tìm thấy bài viết",
+    "notFoundDesc": "Bài viết bạn tìm có thể đã bị gỡ hoặc cập nhật.",
+    "backToHome": "Về trang chủ",
+    "backToArticles": "Quay lại bài viết",
+    "writtenBy": "Viết bởi {{name}}",
+    "authorBio": "Kỹ sư phần mềm và người viết kỹ thuật, tập trung thiết kế giải pháp số tinh gọn.",
+    "tableOfContents": "Mục lục"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "subtitle": "Quản lý bản nháp và xuất bản bài viết lên blog.",
+    "newPost": "Bài viết mới",
+    "totalArticles": "Tổng bài viết",
+    "published": "Đã xuất bản",
+    "drafts": "Bản nháp",
+    "allPosts": "Tất cả bài",
+    "noArticlesTitle": "Không có bài viết",
+    "noArticlesDesc": "Tab này chưa có bài nào. Nhấn \"Bài viết mới\" để tạo.",
+    "tableTitle": "Tiêu đề",
+    "tableStatus": "Trạng thái",
+    "tableTags": "Thẻ",
+    "tableDate": "Ngày xuất bản / Tạo",
+    "tableActions": "Thao tác",
+    "statusPublished": "Đã xuất bản",
+    "statusDraft": "Bản nháp",
+    "editPost": "Sửa bài",
+    "deletePost": "Xóa bài",
+    "deleteConfirm": "Bạn có chắc muốn xóa \"{{title}}\"?"
   },
   "about": {
     "avatarAlt": "Đỗ Cao Minh - Jason",
@@ -144,6 +191,10 @@
     "untitled": "Bài viết chưa có tiêu đề",
     "by": "Bởi",
     "justNow": "Vừa xong",
-    "requiredAlert": "Tiêu đề, slug và nội dung là bắt buộc."
+    "requiredAlert": "Tiêu đề, slug và nội dung là bắt buộc.",
+    "noSummary": "Chưa có tóm tắt."
+  },
+  "common": {
+    "backToTop": "Lên đầu trang"
   }
 }

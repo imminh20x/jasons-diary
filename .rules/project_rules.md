@@ -10,12 +10,18 @@ This document outlines the global rules, style guide, and architecture constrain
 *   **Package Manager**: `npm`.
 
 ## 2. Design System & Aesthetics (Premium Quality)
+
+**Primary reference:** [.rules/design_system.md](design_system.md) — tokens, page templates, typography, and UI checklist.  
+**Layout templates:** [.agents/skills/layout-implementation/SKILL.md](../.agents/skills/layout-implementation/SKILL.md)
+
 Our application must deliver a premium user experience with state-of-the-art visual design.
-*   **Typography**: Use modern Google Fonts (e.g., 'Plus Jakarta Sans', 'Outfit', or 'Inter') instead of browser default fonts.
-*   **Color Palette**: Use curated HSL CSS custom variables for easy theme changes. Avoid pure, raw primary colors. Use smooth, modern gradient backgrounds.
-*   **Visual Style**: Clean glassmorphism (`backdrop-filter: blur()`), subtle border glows, shadow depths, and modern spacing (prefer clamp/rem over pixels).
-*   **Interactions**: Hover states must be dynamic but subtle (e.g., scale up by `1.02`, translate up, smooth transition duration of `0.2s` or `0.3s`).
-*   **Dark Mode**: Dark mode is the primary default theme. Light mode must be clean and soft (no high-contrast white pages).
+
+*   **Typography**: **Be Vietnam Pro** (see `index.css`). Headings use tight letter-spacing (`-0.02em` to `-0.03em`), weight `700`–`800`.
+*   **Layout width**: Public pages use `.container` → `--layout-max` (`79.25rem`). Post pages use the **same outer width**; inner split is prose + 300px TOC (see `BlogPost.css`).
+*   **Color Palette**: Warm editorial palette — cream `#F9F8F6`, linen `#EFE9E3`, taupe `#D9CFC7`, sand accent `#C9B59C`. Full token map: [.rules/design_system.md](design_system.md).
+*   **Visual Style**: Subtle borders, offset section backgrounds, soft shadows — not heavy glassmorphism on every surface.
+*   **Interactions**: Hover states dynamic but subtle (e.g., card `translateY(-3px)`, image `scale(1.02–1.03)`, `var(--transition-normal)`).
+*   **Dark Mode**: Dark mode uses warm charcoal (`#1a1714`) with sand accents; light mode uses the brand cream/linen palette.
 
 ## 3. SEO & Accessibility (a11y)
 *   **Semantic Elements**: Use HTML5 semantic tags (`<header>`, `<main>`, `<section>`, `<article>`, `<footer>`, `<aside>`, `<nav>`).

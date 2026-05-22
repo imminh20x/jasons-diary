@@ -1,15 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search, ArrowRight, BookOpen } from 'lucide-react';
 import { getPosts } from '../utils/mockDb';
 import { getOptimizedCoverImage } from '../utils/imageUrl';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import './BlogHome.css';
-import { t } from 'i18next';
+
+const ALL_TAGS = 'all';
 
 export const BlogHome: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTag, setSelectedTag] = useState('All');
+  const [selectedTag, setSelectedTag] = useState(ALL_TAGS);
 
   // Load posts (only published ones for public view)
   const publishedPosts = useMemo(() => {
@@ -22,8 +25,10 @@ export const BlogHome: React.FC = () => {
     publishedPosts.forEach((post) => {
       post.tags.forEach((tag) => allTags.add(tag));
     });
-    return ['All', ...Array.from(allTags)];
+    return [ALL_TAGS, ...Array.from(allTags)];
   }, [publishedPosts]);
+
+  const isAllTags = selectedTag === ALL_TAGS;
 
   // Filter and sort posts based on search query and selected tag
   const filteredPosts = useMemo(() => {
@@ -33,7 +38,7 @@ export const BlogHome: React.FC = () => {
         post.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchesTag = selectedTag === 'All' || post.tags.includes(selectedTag);
+      const matchesTag = isAllTags || post.tags.includes(selectedTag);
 
       return matchesSearch && matchesTag;
     });
@@ -41,7 +46,7 @@ export const BlogHome: React.FC = () => {
     return filtered.sort((a, b) => 
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
-  }, [publishedPosts, searchQuery, selectedTag]);
+  }, [publishedPosts, searchQuery, selectedTag, isAllTags]);
 
   // Sort all published posts
   const sortedPosts = useMemo(() => {
@@ -50,7 +55,7 @@ export const BlogHome: React.FC = () => {
     );
   }, [publishedPosts]);
 
-  const isFiltered = searchQuery || selectedTag !== 'All';
+  const isFiltered = searchQuery || !isAllTags;
 
   // Extract featured, latest, and more posts dynamically
   const featuredPost = useMemo(() => {
@@ -69,9 +74,12 @@ export const BlogHome: React.FC = () => {
   }, [sortedPosts, filteredPosts, isFiltered]);
 
   const formatDate = (dateString: string) => {
+    const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US';
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    return new Date(dateString).toLocaleDateString(locale, options);
   };
+
+  const getTagLabel = (tag: string) => (tag === ALL_TAGS ? t('home.allTags') : tag);
 
   return (
     <div className="fade-in home-wrapper">
@@ -80,13 +88,13 @@ export const BlogHome: React.FC = () => {
         <div className="ambient-glow" />
         <div className="container">
           <div className="home-hero-inner">
-            <h1 className="home-title">Jason's Diary</h1>
+            <h1 className="home-title">{t('header.logo')}</h1>
             <p className="home-subtitle">
               {t('header.subtitle')}
             </p>
 
             {/* Categories Pills */}
-            <div className="category-pills-container" role="tablist" aria-label="Filter posts by category">
+            <div className="category-pills-container" role="tablist" aria-label={t('home.filterAriaLabel')}>
               {tags.map((tag) => (
                 <button
                   key={tag}
@@ -94,9 +102,9 @@ export const BlogHome: React.FC = () => {
                   aria-selected={selectedTag === tag}
                   onClick={() => setSelectedTag(tag)}
                   className={`category-pill ${selectedTag === tag ? 'active' : ''}`}
-                  data-testid={tag === 'All' ? 'category-pill-all' : `category-pill-${tag.toLowerCase()}`}
+                  data-testid={tag === ALL_TAGS ? 'category-pill-all' : `category-pill-${tag.toLowerCase()}`}
                 >
-                  {tag}
+                  {getTagLabel(tag)}
                 </button>
               ))}
             </div>
@@ -107,12 +115,12 @@ export const BlogHome: React.FC = () => {
                 <Search size={18} className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder={t('home.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input"
                   data-testid="input-search"
-                  aria-label="Search articles"
+                  aria-label={t('home.searchAriaLabel')}
                 />
               </form>
             </div>
@@ -126,15 +134,15 @@ export const BlogHome: React.FC = () => {
         {isFiltered ? (
           <div>
             <div className="section-divider">
-              <span className="section-eyebrow">Results ({filteredPosts.length})</span>
+              <span className="section-eyebrow">{t('home.results', { count: filteredPosts.length })}</span>
               <div className="divider-line" />
             </div>
 
             {filteredPosts.length === 0 ? (
               <div className="empty-state">
                 <BookOpen size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-                <h3>No posts found</h3>
-                <p>Try resetting your tags filter or searching for another term.</p>
+                <h3>{t('home.emptyTitle')}</h3>
+                <p>{t('home.emptyDesc')}</p>
               </div>
             ) : (
               <div className="more-grid" data-testid="blog-posts-list">
@@ -168,7 +176,7 @@ export const BlogHome: React.FC = () => {
                           className="read-more-link"
                           data-testid={`link-read-more-${post.id}`}
                         >
-                          Read Article <ArrowRight size={14} />
+                          {t('home.readArticle')} <ArrowRight size={14} />
                         </Link>
                       </div>
                     </div>
@@ -197,7 +205,7 @@ export const BlogHome: React.FC = () => {
                     </Link>
                   </div>
                   <div className="featured-content">
-                    <span className="text-eyebrow uppercase">Featured</span>
+                    <span className="text-eyebrow uppercase">{t('home.featured')}</span>
                     <h5 className="card-title featured-title">
                       <Link to={`/post/${featuredPost.slug}`}>{featuredPost.title}</Link>
                     </h5>
@@ -220,7 +228,7 @@ export const BlogHome: React.FC = () => {
               {latestPosts.length > 0 && (
                 <div className="latest-section">
                   <div className="section-divider">
-                    <span className="section-eyebrow uppercase">Latest</span>
+                    <span className="section-eyebrow uppercase">{t('home.latest')}</span>
                     <div className="divider-line" />
                   </div>
                   <div className="latest-grid">
@@ -264,7 +272,7 @@ export const BlogHome: React.FC = () => {
               {morePosts.length > 0 && (
                 <div className="more-section">
                   <div className="section-divider">
-                    <span className="section-eyebrow uppercase">More articles</span>
+                    <span className="section-eyebrow uppercase">{t('home.moreArticles')}</span>
                     <div className="divider-line" />
                   </div>
                   <div className="more-grid">
@@ -293,12 +301,6 @@ export const BlogHome: React.FC = () => {
                           </h5>
                           <div className="more-footer">
                             <span className="publish-date">{formatDate(post.publishedAt)}</span>
-                            <Link
-                              to={`/post/${post.slug}`}
-                              className="read-more-link"
-                              data-testid={`link-read-more-${post.id}`}
-                            >
-                            </Link>
                           </div>
                         </div>
                       </article>

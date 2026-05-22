@@ -1,11 +1,17 @@
 ---
 name: layout-implementation
-description: HTML structure and CSS templates to replicate the premium layouts of testdino.com/blog.
+description: HTML structure and CSS templates for testdino.com/blog-inspired layouts. Canonical tokens and widths live in .rules/design_system.md.
 ---
 
 # TestDino Layout Implementation Guide
 
-This skill guide provides the HTML structure and CSS templates to replicate the premium layouts of `testdino.com/blog`.
+This skill provides HTML structure and CSS templates inspired by [testdino.com/blog](https://testdino.com/blog).
+
+**Canonical source of truth:** [.rules/design_system.md](../../.rules/design_system.md) — always check token values, typography, and page specs there before implementing UI. This skill mirrors the implemented patterns in `src/pages/` and `src/components/`.
+
+**Layout width rule:** All public pages share `--layout-max` (`79.25rem` / 1268px) via `.container`. Post pages use the same outer width; the article template only splits inner space into prose + TOC sidebar.
+
+**Color rule:** Use the warm editorial palette from `.rules/design_system.md` (`--palette-*` and `--color-*` tokens). Do not reintroduce cyan/teal accents.
 
 ## 1. Responsive Scroll-to-Hide Header & Mobile Sidebar Drawer
 A sticky navigation header that rolls up upwards on scroll down, slide down on scroll up, and exposes a mobile navigation drawer on mobile viewports.
@@ -164,10 +170,11 @@ Divided into: Hero Section -> Featured Post (Horizontal) -> Latest Posts (Grid).
 
 ### CSS Layout Grid:
 ```css
+/* Use global container — do not hard-code 1360px or 1200px */
 .blog-home-container {
-  max-width: 1360px;
+  max-width: var(--layout-max);
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 0 var(--layout-gutter);
 }
 
 /* Category Slider */
@@ -240,49 +247,54 @@ Divided into: Hero Section -> Featured Post (Horizontal) -> Latest Posts (Grid).
 ---
 
 ## 3. Blog Article View Layout (Sticky TOC)
-Features a header hero banner followed by a dynamic two-column split layout for the article body.
+
+Implemented in `src/pages/BlogPost.tsx` + `BlogPost.css`. Reference: [testdino.com/blog/playwright-1-60-release](https://testdino.com/blog/playwright-1-60-release).
+
+Features: hero banner (back link, title, summary, author, cover) → body section (markdown + sticky TOC). **Outer width = `--layout-max`** (same as home/about).
 
 ### React Layout Structure:
 ```javascript
-<div className="article-page">
-  {/* Article Header (Hero Banner) */}
-  <section className="article-header">
-    <div className="article-header-container">
-      <div className="article-meta-info">
-        <span className="category-tag">{post.tags[0]}</span>
-        <h1 className="article-title">{post.title}</h1>
-        <p className="article-summary">{post.summary}</p>
-        <div className="author-row">
-          <img src={post.author_avatar} alt={post.author} className="author-avatar" />
-          <div>
-            <div className="author-name">{post.author}</div>
-            <div className="publish-date">{new Date(post.created_at).toLocaleDateString()}</div>
+<div className="post-detail-page">
+  <section className="post-header-banner">
+    <div className="container post-header-banner-container">
+      <Link to="/" className="post-back-link" data-testid="link-back-articles">
+        <ArrowLeft size={16} /> Back to Blogs
+      </Link>
+
+      <div className="post-header-grid">
+        <div className="post-header-info">
+          {/* optional .post-header-tags */}
+          <h1 className="post-header-title">{post.title}</h1>
+          <p className="post-header-summary">{post.summary}</p>
+          <div className="post-header-author-row">
+            <img className="author-avatar" width="48" height="48" … />
+            <div className="author-meta">
+              <span className="author-name">{author}</span>
+              <time className="publish-date">{date}</time>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="article-banner-image">
-        <img src={post.thumbnail_url} alt={post.title} />
+        <div className="post-header-cover">
+          <div className="post-cover-wrapper">
+            <img width="563" height="338" fetchPriority="high" … />
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  {/* Article Body Section */}
-  <section className="article-body-section">
-    <div className="article-body-container">
-      <article className="markdown-content">
-        {/* Rendered post HTML */}
-      </article>
-
-      <aside className="article-sidebar">
+  <section className="post-body-section">
+    <div className="container post-body-container">
+      <div className="post-content-column">
+        <div className="markdown-body">{/* ReactMarkdown */}</div>
+        <div className="author-box">…</div>
+      </div>
+      <aside className="post-sidebar" role="complementary">
         <div className="toc-card">
-          <h4 className="toc-title">Mục lục</h4>
-          <ul className="toc-list">
-            {headings.map(heading => (
-              <li key={heading.id} className={`toc-item depth-${heading.depth}`}>
-                <a href={`#${heading.id}`}>{heading.text}</a>
-              </li>
-            ))}
-          </ul>
+          <h3 className="toc-title">Table of Contents</h3>
+          <div className="toc-scroll">
+            <ul className="toc-list">…</ul>
+          </div>
         </div>
       </aside>
     </div>
@@ -290,56 +302,85 @@ Features a header hero banner followed by a dynamic two-column split layout for 
 </div>
 ```
 
-### CSS Layout Styles:
+### CSS Layout Styles (page-scoped tokens):
 ```css
-.article-header {
+.post-detail-page {
+  --post-layout-max: var(--layout-max);
+  --post-sidebar-width: 18.75rem; /* 300px */
+  --post-layout-gap: 3.75rem; /* 60px */
+  --post-content-max: calc(var(--post-layout-max) - var(--post-sidebar-width) - var(--post-layout-gap));
+}
+
+.post-detail-page .container {
+  max-width: var(--post-layout-max);
+}
+
+.post-header-banner {
   background-color: var(--color-bg-offset);
   border-bottom: 1px solid var(--color-border);
-  padding: 4rem 1.5rem;
+  padding: 3.75rem 0 2.5rem;
 }
-.article-header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3rem;
-  align-items: center;
-}
+
 @media (min-width: 1024px) {
-  .article-header-container {
-    grid-template-columns: 1.2fr 1fr;
+  .post-header-banner { padding: 5rem 0 3.75rem; }
+  .post-header-grid {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--post-layout-gap);
+  }
+  .post-header-cover {
+    flex: 0 0 calc(50% - (var(--post-layout-gap) / 2));
   }
 }
 
-.article-body-section {
-  padding: 4rem 1.5rem;
+.post-header-title {
+  font-size: clamp(1.875rem, 4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
 }
-.article-body-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
+
+.post-cover-wrapper {
+  aspect-ratio: 563 / 338;
+  border-radius: var(--radius-lg);
 }
+
+.post-body-section {
+  background-color: var(--color-bg);
+  padding: 3.75rem 0 6rem;
+}
+
 @media (min-width: 1024px) {
-  .article-body-container {
+  .post-body-container {
     flex-direction: row;
-    justify-content: space-between;
+    gap: var(--post-layout-gap);
+  }
+  .post-content-column {
+    flex: 0 1 var(--post-content-max);
+    max-width: var(--post-content-max);
+  }
+  .post-sidebar {
+    flex: 0 0 var(--post-sidebar-width);
   }
 }
-.markdown-content {
-  flex: 1;
-  max-width: 750px;
+
+.post-detail-page .markdown-body {
+  font-size: 1rem;
+  line-height: 1.5;
 }
+
 .toc-card {
   position: sticky;
-  top: 90px; /* Offset for scroll-to-hide header height */
-  border: 1px solid var(--color-border);
+  top: 5.625rem;
+  max-height: 31.25rem;
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  background-color: var(--color-bg);
+}
+
+.toc-item.active {
+  border-left: 3px solid var(--color-text-highlight);
 }
 ```
+
+**Do not:** narrow post pages to 1125px/1200px containers, put back navigation inside the markdown column, or inline author name · date on the post hero.
 
 ---
 

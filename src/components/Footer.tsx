@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Feather, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { SITE_CONTACT, contactEmailHref, contactPhoneHref, hasContactEmail, hasContactPhone } from '../constants/siteContact';
+import { SiteLogo } from './SiteLogo';
 import './Footer.css';
 
 const GithubIcon = () => (
@@ -80,7 +81,7 @@ export const Footer: React.FC = () => {
       <div className="container footer-grid">
         <div className="footer-brand-col">
           <Link to="/" className="footer-logo">
-            <Feather size={20} />
+            <SiteLogo />
             <span>{t('header.logo')}</span>
           </Link>
           <p className="footer-description">{t('header.subtitle')}</p>

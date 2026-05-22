@@ -6,24 +6,25 @@
 }
 
 .header-logo {
-  font-size: 1.25rem;
+  font-size: 1.625rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--color-text-highlight);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
 }
 
-.header-logo svg {
-  color: var(--color-primary);
+.header-logo .site-logo {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .header-logo span {
-  background: var(--color-brand-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-text-highlight);
   display: inline-block;
+  line-height: 1;
 }
 
 .header-links {
@@ -177,7 +178,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(9, 9, 11, 0.4);
+  background-color: var(--color-overlay);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 100;
@@ -250,12 +251,12 @@
 .sidebar-link:hover,
 .sidebar-link.active {
   color: var(--color-primary);
-  background-color: rgba(14, 165, 233, 0.06);
+  background-color: var(--color-accent-subtle);
 }
 
 :root.light .sidebar-link:hover,
 :root.light .sidebar-link.active {
-  background-color: rgba(2, 132, 199, 0.05);
+  background-color: var(--color-accent-subtle);
 }
 
 .sidebar-logout-btn {

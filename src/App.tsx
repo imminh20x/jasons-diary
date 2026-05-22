@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { BackToTop } from './components/BackToTop';
 import { BlogHome } from './pages/BlogHome';
 
 const BlogPost = lazy(() => import('./pages/BlogPost').then((m) => ({ default: m.BlogPost })));
@@ -48,6 +49,7 @@ function App() {
         </div>
 
         <Footer />
+        <BackToTop />
       </div>
     </BrowserRouter>
   );

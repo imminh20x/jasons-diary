@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { ArrowLeft } from 'lucide-react';
 import { getPostBySlug } from '../utils/mockDb';
@@ -9,7 +10,7 @@ import { SITE_AUTHOR } from '../constants/siteAuthor';
 import './BlogPost.css';
 
 // Helper function to recursively extract text content from React nodes
-const getInnerText = (node: any): string => {
+const getInnerText = (node: React.ReactNode): string => {
   if (!node) return '';
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(getInnerText).join('');
@@ -19,12 +20,12 @@ const getInnerText = (node: any): string => {
 
 // Custom components for ReactMarkdown to inject heading IDs and custom styles
 const markdownComponents = {
-  h2: ({ ...props }: any) => {
+  h2: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
     const childrenText = getInnerText(props.children);
     const id = childrenText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return <h2 id={id} {...props} />;
   },
-  h3: ({ ...props }: any) => {
+  h3: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => {
     const childrenText = getInnerText(props.children);
     const id = childrenText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return <h3 id={id} {...props} />;
@@ -32,8 +33,8 @@ const markdownComponents = {
 };
 
 export const BlogPost: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const [activeId, setActiveId] = useState<string>('');
 
   const post = useMemo(() => {
@@ -106,17 +107,18 @@ export const BlogPost: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
+    const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US';
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    return new Date(dateString).toLocaleDateString(locale, options);
   };
 
   if (!post) {
     return (
       <div className="container container-narrow fade-in" style={{ padding: '8rem 1.5rem', textAlign: 'center' }}>
-        <h2>Post Not Found</h2>
-        <p>The article you are looking for might have been removed or updated.</p>
+        <h2>{t('post.notFoundTitle')}</h2>
+        <p>{t('post.notFoundDesc')}</p>
         <Link to="/" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
-          Back to Home
+          {t('post.backToHome')}
         </Link>
       </div>
     );
@@ -124,102 +126,96 @@ export const BlogPost: React.FC = () => {
 
   return (
     <div className="fade-in post-detail-page">
-      {/* 1. Full-width Banner Header */}
       <section className="post-header-banner">
         <div className="container post-header-banner-container">
-          <div className="post-header-info">
-            <div className="post-header-tags">
-              {post.tags.map((tag) => (
-                <span key={tag} className="post-tag">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <h1 className="post-header-title">{post.title}</h1>
-            <p className="post-header-summary">{post.summary}</p>
-            <div className="post-header-author-row">
-              <img
-                src={SITE_AUTHOR.avatar}
-                alt={SITE_AUTHOR.name}
-                className="author-avatar"
-                width="32"
-                height="32"
-                decoding="async"
-              />
-              <div className="author-meta">
-                <span className="author-name">{SITE_AUTHOR.name}</span>
-                <span className="post-meta-divider">·</span>
-                <span className="publish-date">{formatDate(post.publishedAt)}</span>
+          <div className="post-header-grid">
+            <div className="post-header-info">
+              <Link to="/" className="post-back-link" data-testid="link-back-articles">
+                <ArrowLeft size={16} aria-hidden="true" />
+                {t('post.backToArticles')}
+              </Link>
+              <h1 className="post-header-title">{post.title}</h1>
+              <p className="post-header-summary">{post.summary}</p>
+              <div className="post-header-author-row">
+                <img
+                  src={SITE_AUTHOR.avatar}
+                  alt={SITE_AUTHOR.name}
+                  className="author-avatar"
+                  width="56"
+                  height="56"
+                  decoding="async"
+                />
+                <div className="author-meta">
+                  <span className="author-name">{SITE_AUTHOR.name}</span>
+                  <time className="publish-date" dateTime={post.publishedAt}>
+                    {formatDate(post.publishedAt)}
+                  </time>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="post-header-cover">
-            <div className="post-cover-wrapper">
-              <img
-                src={getOptimizedCoverImage(resolvePostCoverImage(post.coverImage, post.title), 800)}
-                alt={post.title}
-                fetchPriority="high"
-                decoding="async"
-                width="800"
-                height="500"
-              />
+
+            <div className="post-header-cover">
+              <div className="post-cover-wrapper">
+                <img
+                  src={getOptimizedCoverImage(resolvePostCoverImage(post.coverImage, post.title), 800)}
+                  alt={post.title}
+                  fetchPriority="high"
+                  decoding="async"
+                  width="563"
+                  height="338"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Split Body Layout Container */}
-      <main className="container post-body-container">
-        {/* Left Column: Markdown Article Body */}
-        <div className="post-content-column">
-          <button onClick={() => navigate(-1)} className="post-back-btn">
-            <ArrowLeft size={16} /> Back to Articles
-          </button>
+      <section className="post-body-section">
+        <div className="container post-body-container">
+          <div className="post-content-column">
+            <div className="markdown-body">
+              <ReactMarkdown components={markdownComponents}>
+                {post.content}
+              </ReactMarkdown>
+            </div>
 
-          <div className="markdown-body">
-            <ReactMarkdown components={markdownComponents}>
-              {post.content}
-            </ReactMarkdown>
-          </div>
-
-          {/* Author Box */}
-          <div className="author-box">
-            <img
-              src={SITE_AUTHOR.avatar}
-              alt={SITE_AUTHOR.name}
-              className="author-avatar"
-            />
-            <div>
-              <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--color-text-highlight)' }}>
-                Written by {SITE_AUTHOR.name}
-              </h4>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)', opacity: 0.8 }}>
-                Technical writer and software engineer focused on designing elegant digital solutions.
-              </p>
+            <div className="author-box">
+              <img
+                src={SITE_AUTHOR.avatar}
+                alt={SITE_AUTHOR.name}
+                className="author-avatar"
+              />
+              <div>
+                <h4 className="author-box-title">{t('post.writtenBy', { name: SITE_AUTHOR.name })}</h4>
+                <p className="author-box-bio">
+                  {t('post.authorBio')}
+                </p>
+              </div>
             </div>
           </div>
+
+          <aside className="post-sidebar" role="complementary">
+            {headings.length > 0 && (
+              <div className="toc-card">
+                <h3 className="toc-title">{t('post.tableOfContents')}</h3>
+                <div className="toc-scroll">
+                  <ul className="toc-list">
+                    {headings.map((heading) => (
+                      <li
+                        key={heading.id}
+                        onClick={() => scrollToHeading(heading.id)}
+                        className={`toc-item toc-item-h${heading.level} ${activeId === heading.id ? 'active' : ''}`}
+                      >
+                        {heading.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </aside>
         </div>
-
-        {/* Right Column: Table of Contents Sidebar */}
-        <aside className="post-sidebar" role="complementary">
-          {headings.length > 0 && (
-            <div className="toc-card">
-              <h3 className="toc-title">Table of Contents</h3>
-              <ul className="toc-list">
-                {headings.map((heading) => (
-                  <li
-                    key={heading.id}
-                    onClick={() => scrollToHeading(heading.id)}
-                    className={`toc-item toc-item-h${heading.level} ${activeId === heading.id ? 'active' : ''}`}
-                  >
-                    {heading.text}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </aside>
-      </main>
+      </section>
     </div>
   );
 };

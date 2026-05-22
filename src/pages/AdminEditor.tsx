@@ -89,7 +89,7 @@ export const AdminEditor: React.FC = () => {
       id,
       title: title.trim(),
       slug: slug.trim(),
-      summary: summary.trim() || 'No summary provided.',
+      summary: summary.trim() || t('editor.noSummary'),
       tags: parsedTags,
       content: content,
       status,

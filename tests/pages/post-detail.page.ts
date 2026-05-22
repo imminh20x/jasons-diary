@@ -14,7 +14,7 @@ export class PostDetailPage {
     this.toc = page.getByRole('complementary');
     this.tocHeading = this.toc.getByRole('heading', { name: /Table of Contents|Mục lục/i });
     this.tocItems = this.toc.locator('.toc-item');
-    this.backButton = page.getByRole('button', { name: /Back to Articles|Quay lại bài viết/i });
+    this.backButton = page.getByTestId('link-back-articles');
     this.authorName = page.locator('.post-header-author-row .author-name');
   }
 

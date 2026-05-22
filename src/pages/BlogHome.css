@@ -11,6 +11,7 @@
   position: relative;
   overflow: hidden;
   margin-bottom: 2rem;
+  background-color: var(--color-bg-offset);
 }
 
 .home-hero-inner {
@@ -62,9 +63,9 @@
 }
 
 .category-pill.active {
-  background-color: var(--color-text-highlight);
-  color: var(--color-bg);
-  border-color: var(--color-text-highlight);
+  background: var(--color-brand-gradient);
+  color: var(--color-on-accent);
+  border-color: transparent;
 }
 
 .category-pill:not(.active):hover {
@@ -92,12 +93,12 @@
 }
 
 .search-form:focus-within {
-  border-color: var(--color-text-muted);
-  box-shadow: 0 0 0 2px rgba(161, 161, 170, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
 }
 
 :root.light .search-form {
-  background-color: #ffffff;
+  background-color: var(--color-bg-offset);
 }
 
 .search-input {
@@ -194,7 +195,7 @@
   letter-spacing: 0.04em;
   color: var(--color-tag-text);
   background-color: var(--color-tag-bg);
-  border: 1px solid rgba(14, 165, 233, 0.12);
+  border: 1px solid var(--color-accent-border);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
 }
@@ -287,10 +288,10 @@
 }
 
 .author-meta {
-  font-size: 0.8125rem;
+  font-size: .81250rem;
   color: var(--color-text-muted);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.35rem;
 }
 

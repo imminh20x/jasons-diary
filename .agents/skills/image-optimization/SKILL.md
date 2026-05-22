@@ -7,6 +7,8 @@ description: Standards and markup patterns to optimize image asset delivery, hel
 
 This skill guide provides the standards and markup patterns to optimize image asset delivery, helping the application achieve a perfect Lighthouse performance score (specifically targetting LCP and CLS).
 
+**Related:** [.rules/design_system.md](../../.rules/design_system.md) §6.5 (cover dimensions per context).
+
 ## 1. Preventing Layout Shift (CLS)
 To prevent Cumulative Layout Shift, always specify explicit width and height dimensions on `<img>` tags, or use CSS aspect-ratio properties. This allows the browser to reserve the correct aspect ratio before the image loads.
 
@@ -21,13 +23,21 @@ To prevent Cumulative Layout Shift, always specify explicit width and height dim
 />
 ```
 
-### CSS Aspect Ratio:
+### CSS Aspect Ratio (by context):
 ```css
+/* Featured / card thumbnails */
 .post-thumbnail {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   object-fit: cover;
-  background-color: var(--color-bg-offset); /* skeleton fallback color */
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-offset);
+}
+
+/* Post detail hero cover — BlogPost.css */
+.post-cover-wrapper {
+  aspect-ratio: 563 / 338;
+  border-radius: var(--radius-lg);
 }
 ```
 
@@ -60,22 +70,23 @@ Only load images when they enter the user's viewport.
 
 ### Example (Hero image vs regular images):
 ```javascript
-// Above the fold (Hero Banner)
-<img 
-  src={post.hero_url} 
-  alt={post.title} 
-  fetchpriority="high" 
-  width="1200" 
-  height="630" 
+// Post detail hero (above the fold)
+<img
+  src={coverUrl}
+  alt={post.title}
+  fetchPriority="high"
+  width="563"
+  height="338"
+  decoding="async"
 />
 
-// Below the fold (Post Feed Items)
-<img 
-  src={post.thumbnail_url} 
-  alt={post.title} 
-  loading="lazy" 
-  width="400" 
-  height="225" 
+// Featured card / feed (below the fold when not LCP)
+<img
+  src={post.thumbnail_url}
+  alt={post.title}
+  loading="lazy"
+  width="400"
+  height="250"
 />
 ```
 

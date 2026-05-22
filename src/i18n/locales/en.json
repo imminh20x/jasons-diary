@@ -20,6 +20,49 @@
     "connect": "Connect",
     "copyright": "© {{year}} Đỗ Cao Minh. All rights reserved. Powered by React & premium aesthetics."
   },
+  "home": {
+    "filterAriaLabel": "Filter posts by category",
+    "allTags": "All",
+    "searchPlaceholder": "Search...",
+    "searchAriaLabel": "Search articles",
+    "results": "Results ({{count}})",
+    "emptyTitle": "No posts found",
+    "emptyDesc": "Try resetting your tags filter or searching for another term.",
+    "featured": "Featured",
+    "latest": "Latest",
+    "moreArticles": "More articles",
+    "readArticle": "Read Article"
+  },
+  "post": {
+    "notFoundTitle": "Post Not Found",
+    "notFoundDesc": "The article you are looking for might have been removed or updated.",
+    "backToHome": "Back to Home",
+    "backToArticles": "Back to Articles",
+    "writtenBy": "Written by {{name}}",
+    "authorBio": "Technical writer and software engineer focused on designing elegant digital solutions.",
+    "tableOfContents": "Table of Contents"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Manage drafts and publish updates to the blog feed.",
+    "newPost": "New Post",
+    "totalArticles": "Total Articles",
+    "published": "Published",
+    "drafts": "Drafts",
+    "allPosts": "All Posts",
+    "noArticlesTitle": "No articles found",
+    "noArticlesDesc": "You don't have any posts in this tab. Click \"New Post\" to create one.",
+    "tableTitle": "Title",
+    "tableStatus": "Status",
+    "tableTags": "Tags",
+    "tableDate": "Published / Created",
+    "tableActions": "Actions",
+    "statusPublished": "Published",
+    "statusDraft": "Draft",
+    "editPost": "Edit post",
+    "deletePost": "Delete post",
+    "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?"
+  },
   "about": {
     "avatarAlt": "Đỗ Cao Minh - Jason",
     "eyebrow": "Available for Opportunities",
@@ -148,6 +191,10 @@
     "untitled": "Untitled Article",
     "by": "By",
     "justNow": "Just now",
-    "requiredAlert": "Title, slug, and content are required."
+    "requiredAlert": "Title, slug, and content are required.",
+    "noSummary": "No summary provided."
+  },
+  "common": {
+    "backToTop": "Back to top"
   }
 }

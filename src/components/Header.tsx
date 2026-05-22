@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sun, Moon, Feather, ShieldAlert, LogOut, Menu, X } from 'lucide-react';
+import { Sun, Moon, ShieldAlert, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { isAdminAuthenticated, setLocalMockAuthenticated } from '../utils/adminAuth';
+import { SiteLogo } from './SiteLogo';
 import './Header.css';
 
 type AppLanguage = 'en' | 'vi';
@@ -61,6 +62,7 @@ export const Header: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => isAdminAuthenticated(user));
 
   const [isVisible, setIsVisible] = useState(true);
+  const [isElevated, setIsElevated] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -102,11 +104,13 @@ export const Header: React.FC = () => {
           setIsVisible(true);
         }
 
+        setIsElevated(currentScrollY > 8);
         lastScrollY = currentScrollY;
         ticking = false;
       });
     };
 
+    setIsElevated(window.scrollY > 8);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -137,10 +141,12 @@ export const Header: React.FC = () => {
   }, [location.pathname]);
 
   return (
-    <header className={`header ${isVisible ? '' : 'header--hidden'}`}>
+    <header
+      className={`header${isVisible ? '' : ' header--hidden'}${isElevated ? ' header--elevated' : ''}`}
+    >
       <div className="container header-nav">
         <Link to="/" className="header-logo" data-testid="nav-link-home">
-          <Feather size={20} />
+          <SiteLogo />
           <span>{t('header.logo')}</span>
         </Link>
 
@@ -161,7 +167,7 @@ export const Header: React.FC = () => {
             {t('header.about')}
           </Link>
 
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <>
               <Link
                 to="/admin"
@@ -180,16 +186,7 @@ export const Header: React.FC = () => {
                 {t('header.logout')}
               </button>
             </>
-          ) : (
-            <Link
-              to="/admin"
-              className={`header-link ${location.pathname === '/admin' ? 'active' : ''}`}
-              data-testid="nav-link-admin"
-            >
-              <ShieldAlert size={16} style={{ marginRight: '4px', verticalAlign: 'text-bottom' }} />
-              {t('header.admin')}
-            </Link>
-          )}
+          ) }
 
           <LangSwitch />
 
@@ -231,7 +228,7 @@ export const Header: React.FC = () => {
       <div className={`sidebar-panel ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <Link to="/" className="header-logo" onClick={() => setIsSidebarOpen(false)}>
-            <Feather size={20} />
+            <SiteLogo />
             <span>{t('header.logo')}</span>
           </Link>
           <button

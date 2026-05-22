@@ -35,6 +35,10 @@ The Frontend Agent must write code that is easy to test:
         *   Post list container: `data-testid="blog-posts-list"`
         *   Individual post cards: `data-testid="card-post-[id]"` (where `[id]` is the unique post ID or slug)
         *   Read more link: `data-testid="link-read-more-[id]"`
+    *   **Post detail**:
+        *   Back to Blogs link (hero): `data-testid="link-back-articles"`
+    *   **Global**:
+        *   Back to top button: `data-testid="btn-back-to-top"` (mounted in `App.tsx` on all routes)
     *   **Portfolio page (About)**:
         *   Contact email button: `data-testid="btn-contact-email"`
         *   GitHub profile link: `data-testid="link-github"`
@@ -48,13 +52,15 @@ The Frontend Agent must write code that is easy to test:
 *   **Consistent ARIA Roles**: Use proper semantic roles. If a custom interactive component is built, add appropriate roles (`role="button"`, `role="dialog"`, etc.) and ensure keyboard navigation works.
 
 ## 3. Aesthetics, Animations & Theme
-*   **CSS Variables**: All colors, fonts, margins, transitions, and border radius must reference design tokens in `index.css`.
+
+**Read first:** [.rules/design_system.md](design_system.md) and [.agents/skills/layout-implementation/SKILL.md](../.agents/skills/layout-implementation/SKILL.md).
+
+*   **CSS Variables**: All colors, fonts, spacing, transitions, and border radius must reference tokens in `index.css` (and page-scoped vars like `--post-layout-max` on `.post-detail-page`). Never hard-code `1200px` / `1125px` container widths.
+*   **Layout consistency**: Use `.container` (`--layout-max`) for all public pages including post detail hero and body. Article pages split inner columns only (prose + TOC).
 *   **Smooth Hover Effects**: Always add transitions for styling changes (e.g., `transition: background-color 0.2s ease-in-out, transform 0.2s ease`).
-*   **Responsive Mobile Layout**: Ensure layout collapses cleanly below `768px`. Render Hamburger icons, side drawers, and stacked grids.
+*   **Responsive Mobile Layout**: Ensure layout collapses cleanly below `768px`. Render Hamburger icons, side drawers, and stacked grids. Hide post TOC below `1024px`.
 *   **Animations**: Leverage standard CSS Keyframes or the Web Animations API for loading states, page entries, and slide transitions (e.g. mobile drawer translateX).
-*   **Image Loading**: Implement modern loading strategies:
-    *   Set `loading="lazy"` on below-the-fold images.
-    *   Specify explicit `width` and `height` on images to avoid Layout Shifts (CLS).
+*   **Image Loading**: See [.agents/skills/image-optimization/SKILL.md](../.agents/skills/image-optimization/SKILL.md). Set explicit dimensions; hero post cover `563×338`, `fetchPriority="high"`.
 
 ## 4. Quality Standard
 *   No unused React imports or variables.
