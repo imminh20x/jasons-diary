@@ -1,26 +1,26 @@
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { isMockMode, supabaseEnv } from './supabaseConfig';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export { isMockMode } from './supabaseConfig';
 
-const isPlaceholder = (val: string | undefined): boolean => {
-  if (!val) return true;
-  const lower = val.toLowerCase();
-  return (
-    lower.includes('your-project-id') ||
-    lower.includes('your-anon-public-api-key') ||
-    lower.includes('placeholder')
-  );
-};
+let client: SupabaseClient | undefined;
+let clientPromise: Promise<SupabaseClient> | undefined;
 
-// Check if variables are missing or contain placeholder values
-export const isMockMode = isPlaceholder(supabaseUrl) || isPlaceholder(supabaseAnonKey);
+export async function getSupabase(): Promise<SupabaseClient> {
+  if (isMockMode) {
+    throw new Error('Supabase is not configured.');
+  }
 
-if (isMockMode) {
-  console.warn("Supabase env variables are missing or placeholders. Using mock backend fallback.");
+  if (client) {
+    return client;
+  }
+
+  if (!clientPromise) {
+    clientPromise = import('@supabase/supabase-js').then(({ createClient }) => {
+      client = createClient(supabaseEnv.url, supabaseEnv.anonKey);
+      return client;
+    });
+  }
+
+  return clientPromise;
 }
-
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
-);

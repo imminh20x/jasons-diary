@@ -37,6 +37,8 @@ compare-*.png
 .vscode/*
 !.vscode/extensions.json
 .idea
+.agents/
+.rules/
 .DS_Store
 *.suo
 *.ntvs*

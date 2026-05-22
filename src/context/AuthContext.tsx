@@ -1,7 +1,8 @@
 /* eslint-disable */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
-import { supabase, isMockMode } from '../supabaseClient';
+import { getSupabase } from '../supabaseClient';
+import { isMockMode } from '../supabaseConfig';
 import { isDevMockAuthEnabled } from '../utils/adminAuth';
 
 interface AuthContextType {
@@ -32,25 +33,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       setLoading(false);
     } else {
-      // Get initial session
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }).catch((err) => {
-        console.error("Error getting session:", err);
-        setLoading(false);
-      });
+      let subscription: { unsubscribe: () => void } | undefined;
 
-      // Listen for auth state changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      });
+      void getSupabase()
+        .then(async (supabase) => {
+          const { data: { session } } = await supabase.auth.getSession();
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+
+          const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+            setSession(nextSession);
+            setUser(nextSession?.user ?? null);
+            setLoading(false);
+          });
+          subscription = authSubscription;
+        })
+        .catch((err) => {
+          console.error('Error getting session:', err);
+          setLoading(false);
+        });
 
       return () => {
-        subscription.unsubscribe();
+        subscription?.unsubscribe();
       };
     }
   }, []);
@@ -99,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
         }
       } else {
+        const supabase = await getSupabase();
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           return { data: { user: null, session: null }, error };
@@ -124,6 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(null);
         return { error: null };
       } else {
+        const supabase = await getSupabase();
         const { error } = await supabase.auth.signOut();
         if (!error) {
           setUser(null);

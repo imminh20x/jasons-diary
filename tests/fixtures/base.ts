@@ -40,6 +40,8 @@ export const test = base.extend<Pages>({
     await page.addInitScript(() => {
       window.localStorage.setItem('app_language', 'en');
       window.localStorage.setItem('app_theme', 'light');
+      window.localStorage.removeItem('admin_authenticated');
+      window.sessionStorage.clear();
     });
 
     const consoleMessages: string[] = [];

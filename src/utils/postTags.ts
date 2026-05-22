@@ -1,4 +1,4 @@
-import { isMockMode } from '../supabaseClient';
+import { isMockMode } from '../supabaseConfig';
 import { fetchPostTags as fetchPostTagsFromDb, registerPostTags as registerPostTagsInDb } from '../services/db';
 import { mergeUniquePostTags, normalizePostTag, postTagKey } from './postTagUtils';
 

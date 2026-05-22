@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js';
-import { isMockMode } from '../supabaseClient';
+import { isMockMode } from '../supabaseConfig';
 
 export const isDevMockAuthEnabled = import.meta.env.DEV && isMockMode;
 

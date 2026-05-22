@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { BackToTop } from './components/BackToTop';
-import { BlogHome } from './pages/BlogHome';
 
+const BlogHome = lazy(() => import('./pages/BlogHome').then((m) => ({ default: m.BlogHome })));
 const BlogPost = lazy(() => import('./pages/BlogPost').then((m) => ({ default: m.BlogPost })));
 const About = lazy(() => import('./pages/About').then((m) => ({ default: m.About })));
 const Login = lazy(() => import('./pages/Login').then((m) => ({ default: m.Login })));

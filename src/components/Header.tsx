@@ -186,7 +186,7 @@ export const Header: React.FC = () => {
                 {t('header.logout')}
               </button>
             </>
-          ) }
+          )}
 
           <LangSwitch />
 

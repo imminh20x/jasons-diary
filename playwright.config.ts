@@ -1,10 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const testPublicEnv = {
+  VITE_SUPABASE_URL: 'https://your-project-id.supabase.co',
+  VITE_SUPABASE_ANON_KEY: 'your-anon-public-api-key',
   VITE_CONTACT_EMAIL: 'you@example.com',
   VITE_CONTACT_PHONE: '+10000000000',
   VITE_GITHUB_URL: 'https://github.com/your-username',
   VITE_LINKEDIN_URL: 'https://linkedin.com/in/your-username',
+  VITE_FACEBOOK_URL: '',
 };
 
 export default defineConfig({
@@ -15,16 +18,16 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5199',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 10000,
+    command: 'npm run dev -- --port 5199 --strictPort',
+    url: 'http://localhost:5199',
+    reuseExistingServer: false,
+    timeout: 120000,
     env: {
       ...process.env,
       ...testPublicEnv,

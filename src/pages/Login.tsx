@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { isMockMode } from '../supabaseClient';
+import { isMockMode } from '../supabaseConfig';
 import {
   clearStaleMockAuth,
   isAdminAuthenticated,

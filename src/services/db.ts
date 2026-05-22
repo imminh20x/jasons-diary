@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { supabase, isMockMode } from '../supabaseClient';
+import { getSupabase } from '../supabaseClient';
+import { isMockMode } from '../supabaseConfig';
 import { normalizePostTag, postTagKey } from '../utils/postTagUtils';
 
 export interface Post {
@@ -118,6 +119,7 @@ export const fetchPosts = async (options?: { includeDrafts?: boolean }): Promise
       const sorted = filtered.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
       return { data: sorted, error: null };
     } else {
+      const supabase = await getSupabase();
       let query = supabase.from('posts').select('*');
       if (!options?.includeDrafts) {
         query = query.eq('is_published', true);
@@ -140,6 +142,7 @@ export const fetchPostBySlug = async (slug: string): Promise<{ data: Post | null
       }
       return { data: post, error: null };
     } else {
+      const supabase = await getSupabase();
       const { data, error } = await supabase
         .from('posts')
         .select('*')
@@ -182,6 +185,7 @@ export const createPost = async (post: Omit<Post, 'id' | 'created_at' | 'updated
       saveMockPosts(posts);
       return { data: newPost, error: null };
     } else {
+      const supabase = await getSupabase();
       const { data, error } = await supabase
         .from('posts')
         .insert([{
@@ -230,6 +234,7 @@ export const updatePost = async (id: string, post: Partial<Omit<Post, 'id' | 'cr
       saveMockPosts(posts);
       return { data: updatedPost, error: null };
     } else {
+      const supabase = await getSupabase();
       const { data, error } = await supabase
         .from('posts')
         .update({
@@ -264,6 +269,7 @@ export const deletePost = async (id: string): Promise<{ data: { id: string } | n
       saveMockPosts(filtered);
       return { data: { id }, error: null };
     } else {
+      const supabase = await getSupabase();
       const { error } = await supabase
         .from('posts')
         .delete()
@@ -278,6 +284,7 @@ export const deletePost = async (id: string): Promise<{ data: { id: string } | n
 
 export const fetchPostTags = async (): Promise<{ data: PostTag[] | null; error: any }> => {
   try {
+    const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('post_tags')
       .select('*')
@@ -297,6 +304,7 @@ export const registerPostTags = async (
       return { error: null };
     }
 
+    const supabase = await getSupabase();
     const { error } = await supabase
       .from('post_tags')
       .upsert(tags, { onConflict: 'name_key', ignoreDuplicates: true });
@@ -330,6 +338,7 @@ export const uploadImage = async (file: File): Promise<{ data: { url: string } |
       });
       return { data: { url }, error: null };
     } else {
+      const supabase = await getSupabase();
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;

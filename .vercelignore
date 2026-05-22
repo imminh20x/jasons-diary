@@ -6,4 +6,8 @@ dist
 playwright-report
 test-results
 tests
-*.png
+
+# Local dev screenshots only — keep public/brand/*.png for production
+layout-*.png
+compare-*.png
+*-fixed-*.png

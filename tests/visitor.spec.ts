@@ -10,7 +10,7 @@ test.describe('Visitor Flow', () => {
     await expect(homePage.header).toBeVisible();
 
     await expect(homePage.homeNavLink.first()).toBeVisible();
-    await expect(homePage.adminNavLink).toBeVisible();
+    await expect(homePage.aboutNavLink).toBeVisible();
     await expect(homePage.themeToggleBtn).toBeVisible();
 
     await expect(homePage.footer).toBeVisible();
