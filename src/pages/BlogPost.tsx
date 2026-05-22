@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { isValidElement, useMemo, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
@@ -11,10 +11,12 @@ import './BlogPost.css';
 
 // Helper function to recursively extract text content from React nodes
 const getInnerText = (node: React.ReactNode): string => {
-  if (!node) return '';
+  if (node == null || typeof node === 'boolean') return '';
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(getInnerText).join('');
-  if (node.props && node.props.children) return getInnerText(node.props.children);
+  if (isValidElement<{ children?: React.ReactNode }>(node)) {
+    return getInnerText(node.props.children);
+  }
   return '';
 };
 
