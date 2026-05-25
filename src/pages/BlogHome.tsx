@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, ArrowRight, BookOpen } from 'lucide-react';
-import { getPosts } from '../services/postService';
+import { getPosts, getCachedPosts } from '../services/postService';
 import type { BlogPost } from '../types/post';
 import { getOptimizedCoverImage } from '../utils/imageUrl';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
@@ -14,7 +14,7 @@ export const BlogHome: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState(ALL_TAGS);
-  const [publishedPosts, setPublishedPosts] = useState<BlogPost[]>([]);
+  const [publishedPosts, setPublishedPosts] = useState<BlogPost[]>(() => getCachedPosts() ?? []);
 
   useEffect(() => {
     let cancelled = false;

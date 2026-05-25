@@ -11,7 +11,7 @@
     "openMenu": "Mở menu",
     "closeMenu": "Đóng menu",
     "language": "Ngôn ngữ",
-    "subtitle": "Đây là nơi show Portfolio của mình cũng như chia sẻ những suy nghĩ và kinh nghiệm về QA/QC và AI."
+    "subtitle": "Đây là nơi show Portfolio của mình cũng như chia sẻ những kiến thức hữu ích từ khắp nơi trên thế giới và kinh nghiệm về QA/QC và AI."
   },
   "footer": {
     "navigation": "Điều hướng",
@@ -89,56 +89,63 @@
       }
     },
     "jobs": {
-      "items": [
+      "groups": [
         {
-          "date": "Th12/2025 – Hiện tại",
-          "role": "QA/QC – Hệ thống E-Invoice",
-          "company": "TripOTA",
-          "teamSize": "Quy mô team: 8",
-          "bullets": [
-            "Review tài liệu và tư vấn giải pháp cho BA và khách hàng.",
-            "Kiểm thử web thủ công và cơ sở dữ liệu với DBeaver, đảm bảo ứng dụng hoạt động với nhiều nhà cung cấp và người dùng hóa đơn.",
-            "Lập test plan, log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
-            "Đảm bảo hệ thống tích hợp mượt với các ứng dụng khác trong hệ sinh thái du lịch nội bộ.",
-            "Áp dụng Gen AI để sinh test case và phân tích User Story.",
-            "Tự học và triển khai từng bước dự án automation test đầu tiên của công ty."
+          "company": "TripOTA Company - Hong Ngoc Ha Travel Group",
+          "positions": [
+            {
+              "date": "Th12/2025 – Hiện tại",
+              "role": "QA/QC – Hệ thống E-Invoice",
+              "teamSize": "Quy mô team: 8",
+              "bullets": [
+                "Review tài liệu và tư vấn giải pháp cho BA và khách hàng.",
+                "Kiểm thử tự động E2E với Playwright.",
+                "Kiểm thử web thủ công và cơ sở dữ liệu với DBeaver, đảm bảo ứng dụng hoạt động với nhiều nhà cung cấp và người dùng hóa đơn.",
+                "Lập test plan, log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
+                "Đảm bảo hệ thống tích hợp mượt với các ứng dụng khác trong hệ sinh thái du lịch nội bộ.",
+                "Áp dụng Gen AI để sinh test case và phân tích User Story.",
+                "Tự học và triển khai từng bước dự án automation test đầu tiên của công ty."
+              ]
+            },
+            {
+              "date": "Th3/2025 – Th12/2025",
+              "role": "QA/QC – API Tester – API Hub",
+              "teamSize": "Quy mô team: 5",
+              "bullets": [
+                "Làm việc trực tiếp với Vietnam Airlines, VietJet Air và GDS để xây dựng API hub giúp OTA tích hợp đặt vé hàng không.",
+                "Lập test plan, log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
+                "Triển khai automation data-driven testing với Apidog, đảm bảo độ tin cậy và khả năng mở rộng của hệ thống đặt vé.",
+                "Xây dựng tài liệu kỹ thuật Flight API Hub bằng Docusaurus, AI MCP server và Gen AI cho developer và đối tác tích hợp.",
+                "Thu thập yêu cầu, làm rõ business rules và trao đổi trực tiếp với khách hàng với vai trò BA."
+              ]
+            },
+            {
+              "date": "Th5/2024 – Th3/2025",
+              "role": "Junior QA/QC – Hệ thống TMC",
+              "teamSize": "Quy mô team: 11",
+              "bullets": [
+                "Gặp trực tiếp khách hàng để thu thập yêu cầu.",
+                "Review tài liệu và tư vấn giải pháp cho BA.",
+                "Log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
+                "Kiểm thử thủ công các chức năng để đảm bảo ứng dụng hoạt động ổn định."
+              ]
+            }
           ]
         },
         {
-          "date": "Th3/2025 – Th12/2025",
-          "role": "QA/QC – API Tester – API Hub",
-          "company": "TripOTA",
-          "teamSize": "Quy mô team: 5",
-          "bullets": [
-            "Làm việc trực tiếp với Vietnam Airlines, VietJet Air và GDS để xây dựng API hub giúp OTA tích hợp đặt vé hàng không.",
-            "Lập test plan, log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
-            "Triển khai automation data-driven testing với Apidog, đảm bảo độ tin cậy và khả năng mở rộng của hệ thống đặt vé.",
-            "Xây dựng tài liệu kỹ thuật Flight API Hub bằng Docusaurus, AI MCP server và Gen AI cho developer và đối tác tích hợp.",
-            "Thu thập yêu cầu, làm rõ business rules và trao đổi trực tiếp với khách hàng với vai trò BA."
-          ]
-        },
-        {
-          "date": "Th5/2024 – Th3/2025",
-          "role": "Junior QA/QC – Hệ thống TMC",
-          "company": "TripOTA",
-          "teamSize": "Quy mô team: 11",
-          "bullets": [
-            "Gặp trực tiếp khách hàng để thu thập yêu cầu.",
-            "Review tài liệu và tư vấn giải pháp cho BA.",
-            "Log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
-            "Kiểm thử thủ công các chức năng để đảm bảo ứng dụng hoạt động ổn định."
-          ]
-        },
-        {
-          "date": "Th8/2023 – Th5/2024",
-          "role": "Junior Developer – Hệ thống ERP",
-          "company": "GradiOn Vietnam",
-          "teamSize": "Quy mô team: 10",
-          "bullets": [
-            "Phát triển hệ thống API hiệu năng cao bằng .NET Core API với kiến trúc N-Tier.",
-            "Đảm nhiệm cả developer và QC, duy trì ~90% unit-test coverage với NUnit.",
-            "Kiểm thử API ở mức unit, integration và system.",
-            "Trở thành cố vấn đáng tin cậy, đưa ra insight kinh doanh trực tiếp cho đối tác."
+          "company": "NFQ Asia",
+          "positions": [
+            {
+              "date": "Th8/2023 – Th5/2024",
+              "role": "Junior Developer – Hệ thống ERP",
+              "teamSize": "Quy mô team: 10",
+              "bullets": [
+                "Phát triển hệ thống API hiệu năng cao bằng .NET Core API với kiến trúc N-Tier.",
+                "Đảm nhiệm cả developer và QC, duy trì ~90% unit-test coverage với NUnit.",
+                "Kiểm thử API ở mức unit, integration và system.",
+                "Trở thành cố vấn đáng tin cậy, đưa ra insight kinh doanh trực tiếp cho đối tác."
+              ]
+            }
           ]
         }
       ]

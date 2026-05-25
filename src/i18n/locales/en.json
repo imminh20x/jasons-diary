@@ -11,7 +11,7 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "language": "Language",
-    "subtitle": "This is where I show my portfolio and share my thoughts and experiences about QA/QC and AI."
+    "subtitle": "This is where I show my portfolio and share useful knowledge all over the world and my experience about QA/QC and AI."
   },
   "footer": {
     "navigation": "Navigation",
@@ -89,56 +89,64 @@
       }
     },
     "jobs": {
-      "items": [
+      "groups": [
         {
-          "date": "Dec 2025 – Present",
-          "role": "QA/QC – E-Invoice System",
-          "company": "TripOTA",
-          "teamSize": "Team size: 8",
-          "bullets": [
-            "Review documents and consultant solutions for BA and customers.",
-            "Manual web testing and database validation with DBeaver across multiple invoice providers and consumers.",
-            "Create test plans, log bugs in Azure DevOps, daily reporting, scheduling, and quality management.",
-            "Ensure smooth integration with other applications in the internal travel ecosystem.",
-            "Apply Gen AI to generate test cases and analyze user stories.",
-            "Self-learn and progressively roll out the company's first automation testing project."
+          "company": "TripOTA Company - Hong Ngoc Ha Travel Group",
+          "date": "May 2024 - Present",
+          "positions": [
+            {
+              "date": "Dec 2025 – Present",
+              "role": "QA/QC – E-Invoice System",
+              "teamSize": "Team size: 8",
+              "bullets": [
+                "Review documents and consultant solutions for BA and customers.",
+                "Automation E2E testing with Playwright.",
+                "Manual web testing and database validation with DBeaver across multiple invoice providers and consumers.",
+                "Create test plans, log bugs in Azure DevOps, daily reporting, scheduling, and quality management.",
+                "Ensure smooth integration with other applications in the internal travel ecosystem.",
+                "Apply Gen AI to generate test cases and analyze user stories.",
+                "Self-learn and progressively roll out the company's first automation testing project."
+              ]
+            },
+            {
+              "date": "Mar 2025 – Dec 2025",
+              "role": "QA/QC – API Tester – API Hub",
+              "teamSize": "Team size: 5",
+              "bullets": [
+                "Worked with Vietnam Airlines, VietJet Air, and GDS providers to build an API hub for OTA–airline booking integration.",
+                "Create test plans, log bugs in Azure DevOps, daily reporting, scheduling, and quality management.",
+                "Implement data-driven testing automation with Apidog for reliable, scalable airline booking flows.",
+                "Built Flight API Hub technical documentation with Docusaurus, AI MCP server, and Gen AI for developers and integrators.",
+                "Collected requirements, elicited business rules, and communicated directly with clients as a BA."
+              ]
+            },
+            {
+              "date": "May 2024 – Mar 2025",
+              "role": "Junior QA/QC – TMC System",
+              "teamSize": "Team size: 11",
+              "bullets": [
+                "Met directly with customers to gather requirements.",
+                "Reviewed documents and consultant solutions for BA.",
+                "Logged bugs in Azure DevOps, daily reporting, scheduling, and quality management.",
+                "Manually tested features to ensure the application worked smoothly."
+              ]
+            }
           ]
         },
         {
-          "date": "Mar 2025 – Dec 2025",
-          "role": "QA/QC – API Tester – API Hub",
-          "company": "TripOTA",
-          "teamSize": "Team size: 5",
-          "bullets": [
-            "Worked with Vietnam Airlines, VietJet Air, and GDS providers to build an API hub for OTA–airline booking integration.",
-            "Create test plans, log bugs in Azure DevOps, daily reporting, scheduling, and quality management.",
-            "Implement data-driven testing automation with Apidog for reliable, scalable airline booking flows.",
-            "Built Flight API Hub technical documentation with Docusaurus, AI MCP server, and Gen AI for developers and integrators.",
-            "Collected requirements, elicited business rules, and communicated directly with clients as a BA."
-          ]
-        },
-        {
-          "date": "May 2024 – Mar 2025",
-          "role": "Junior QA/QC – TMC System",
-          "company": "TripOTA",
-          "teamSize": "Team size: 11",
-          "bullets": [
-            "Met directly with customers to gather requirements.",
-            "Reviewed documents and consultant solutions for BA.",
-            "Logged bugs in Azure DevOps, daily reporting, scheduling, and quality management.",
-            "Manually tested features to ensure the application worked smoothly."
-          ]
-        },
-        {
-          "date": "Aug 2023 – May 2024",
-          "role": "Jr Developer – ERP System",
-          "company": "GradiOn Vietnam",
-          "teamSize": "Team size: 10",
-          "bullets": [
-            "Developed highly performant API system using .NET Core API with N-Tier architecture.",
-            "Acted as both developer and QC, maintaining ~90% unit-test coverage with NUnit.",
-            "Tested APIs at unit, integration, and system levels.",
-            "Became a trusted advisor, providing direct business insights to partners."
+          "company": "NFQ Asia",
+          "positions": [
+            {
+              "date": "Aug 2023 – May 2024",
+              "role": "Jr Developer – ERP System",
+              "teamSize": "Team size: 10",
+              "bullets": [
+                "Developed highly performant API system using .NET Core API with N-Tier architecture.",
+                "Acted as both developer and QC, maintaining ~90% unit-test coverage with NUnit.",
+                "Tested APIs at unit, integration, and system levels.",
+                "Became a trusted advisor, providing direct business insights to partners."
+              ]
+            }
           ]
         }
       ]

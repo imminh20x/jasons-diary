@@ -42,7 +42,7 @@ test.describe('About Me Portfolio Page E2E', () => {
     await expect(page.getByText('Experience', { exact: true })).toBeVisible();
     await expect(page.locator('.timeline').getByText('TripOTA').first()).toBeVisible();
     await expect(page.locator('.timeline-role').filter({ hasText: /E-Invoice/i }).first()).toBeVisible();
-    await expect(page.getByText('GradiOn Vietnam')).toBeVisible();
+    await expect(page.getByText('NFQ Asia')).toBeVisible();
     await expect(page.getByText('Can Tho University')).toBeVisible();
     await expect(page.getByText('Software Engineering')).toBeVisible();
   });

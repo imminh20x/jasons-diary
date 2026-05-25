@@ -59,17 +59,21 @@ const FacebookIcon = () => (
   </svg>
 );
 
-type AboutJob = {
+type AboutJobPosition = {
   date: string;
   role: string;
-  company: string;
   teamSize?: string;
   bullets: string[];
 };
 
+type AboutJobGroup = {
+  company: string;
+  positions: AboutJobPosition[];
+};
+
 export const About: React.FC = () => {
   const { t } = useTranslation();
-  const jobs = t('about.jobs.items', { returnObjects: true }) as AboutJob[];
+  const jobGroups = t('about.jobs.groups', { returnObjects: true }) as AboutJobGroup[];
 
   return (
     <div className="about-page fade-in">
@@ -191,21 +195,30 @@ export const About: React.FC = () => {
             </div>
 
             <div className="timeline">
-              {jobs.map((job) => (
-                <div key={`${job.company}-${job.role}-${job.date}`} className="timeline-item">
+              {jobGroups.map((group) => (
+                <div key={group.company} className="timeline-item">
                   <div className="timeline-badge">
                     <Briefcase size={16} />
                   </div>
                   <div className="timeline-content">
-                    <span className="timeline-date">{job.date}</span>
-                    <h4 className="timeline-role">{job.role}</h4>
-                    <h5 className="timeline-company">
-                      {job.company}
-                      {job.teamSize ? <span className="timeline-team-size"> · {job.teamSize}</span> : null}
-                    </h5>
-                    <ul className="timeline-desc-list">
-                      {job.bullets.map((item) => (
-                        <li key={item}>{item}</li>
+                    <h3 className="timeline-company">{group.company}</h3>
+                    <ul className="timeline-positions">
+                      {group.positions.map((position) => (
+                        <li
+                          key={`${position.role}-${position.date}`}
+                          className="timeline-position"
+                        >
+                          <span className="timeline-date">{position.date}</span>
+                          <h4 className="timeline-role">
+                            {position.role}
+                            {position.teamSize ? ` - ${position.teamSize}` : null}
+                          </h4>
+                          <ul className="timeline-desc-list">
+                            {position.bullets.map((item) => (
+                              <li key={item}>{item}</li>
+                            ))}
+                          </ul>
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -227,8 +240,8 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">{t('about.certs.education.date')}</span>
+                  <h3 className="timeline-company">{t('about.certs.education.company')}</h3>
                   <h4 className="timeline-role">{t('about.certs.education.role')}</h4>
-                  <h5 className="timeline-company">{t('about.certs.education.company')}</h5>
                   <p className="timeline-desc">{t('about.certs.education.desc')}</p>
                 </div>
               </div>
@@ -239,8 +252,8 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">2024</span>
+                  <h3 className="timeline-company">{t('about.certs.toeic.company')}</h3>
                   <h4 className="timeline-role">{t('about.certs.toeic.role')}</h4>
-                  <h5 className="timeline-company">{t('about.certs.toeic.company')}</h5>
                 </div>
               </div>
 
@@ -250,8 +263,8 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">2024</span>
+                  <h3 className="timeline-company">{t('about.certs.efset.company')}</h3>
                   <h4 className="timeline-role">{t('about.certs.efset.role')}</h4>
-                  <h5 className="timeline-company">{t('about.certs.efset.company')}</h5>
                 </div>
               </div>
 
@@ -261,8 +274,8 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">2021</span>
+                  <h3 className="timeline-company">{t('about.certs.aws.company')}</h3>
                   <h4 className="timeline-role">{t('about.certs.aws.role')}</h4>
-                  <h5 className="timeline-company">{t('about.certs.aws.company')}</h5>
                   <p className="timeline-desc">{t('about.certs.aws.desc')}</p>
                   <a
                     href="https://buildonvietnam21.s3.ap-southeast-1.amazonaws.com/BOVN21+Certificates/Timo+Digital+Bank_Technophile_Cao+Minh+Do.pdf"

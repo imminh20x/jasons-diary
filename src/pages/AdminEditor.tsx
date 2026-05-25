@@ -278,7 +278,7 @@ export const AdminEditor: React.FC = () => {
           className="post-back-link"
           data-testid="editor-back-link"
         >
-          <ArrowLeft size={16} aria-hidden="true" />
+           <ArrowLeft size={16} aria-hidden="true" />
           {t('editor.backToDashboard')}
         </div>
 

@@ -11,12 +11,49 @@ import type { BlogPost, SaveBlogPostInput } from '../types/post';
 
 export type { BlogPost, SaveBlogPostInput } from '../types/post';
 
+type PostsCacheKey = 'published' | 'all';
+
+const postsCache = new Map<PostsCacheKey, BlogPost[]>();
+const postsInflight = new Map<PostsCacheKey, Promise<BlogPost[]>>();
+
+const cacheKey = (options?: { includeDrafts?: boolean }): PostsCacheKey =>
+  options?.includeDrafts ? 'all' : 'published';
+
+export function getCachedPosts(options?: { includeDrafts?: boolean }): BlogPost[] | undefined {
+  return postsCache.get(cacheKey(options));
+}
+
+export function invalidatePostsCache(): void {
+  postsCache.clear();
+  postsInflight.clear();
+}
+
 export async function getPosts(options?: { includeDrafts?: boolean }): Promise<BlogPost[]> {
-  const { data, error } = await fetchPosts(options);
-  if (error || !data) {
-    return [];
+  const key = cacheKey(options);
+  const cached = postsCache.get(key);
+  if (cached) {
+    return cached;
   }
-  return data.map(mapDbPostToBlogPost);
+
+  const inflight = postsInflight.get(key);
+  if (inflight) {
+    return inflight;
+  }
+
+  const request = fetchPosts(options)
+    .then(({ data, error }) => {
+      const posts = error || !data ? [] : data.map(mapDbPostToBlogPost);
+      postsCache.set(key, posts);
+      postsInflight.delete(key);
+      return posts;
+    })
+    .catch((err) => {
+      postsInflight.delete(key);
+      throw err;
+    });
+
+  postsInflight.set(key, request);
+  return request;
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
@@ -38,22 +75,32 @@ export async function getPostById(id: string): Promise<BlogPost | undefined> {
 export async function savePost(post: SaveBlogPostInput): Promise<BlogPost | null> {
   const payload = mapBlogPostToDbPayload(post);
 
+  let saved: BlogPost | null = null;
+
   if (post.id) {
     const { data, error } = await updatePost(post.id, payload);
     if (error || !data) {
       return null;
     }
-    return mapDbPostToBlogPost(data);
+    saved = mapDbPostToBlogPost(data);
+  } else {
+    const { data, error } = await createPost(payload);
+    if (error || !data) {
+      return null;
+    }
+    saved = mapDbPostToBlogPost(data);
   }
 
-  const { data, error } = await createPost(payload);
-  if (error || !data) {
-    return null;
-  }
-  return mapDbPostToBlogPost(data);
+  invalidatePostsCache();
+  return saved;
 }
 
 export async function deletePost(id: string): Promise<boolean> {
   const { error } = await deleteDbPost(id);
-  return !error;
+  if (error) {
+    return false;
+  }
+
+  invalidatePostsCache();
+  return true;
 }
