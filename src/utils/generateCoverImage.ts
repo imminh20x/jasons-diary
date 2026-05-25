@@ -196,7 +196,7 @@ export function generateCoverImageDataUrl(title: string, width = 1200, height = 
     y="${textY}"
     text-anchor="middle"
     fill="#0f172a"
-    font-family="'Be Vietnam Pro', system-ui, -apple-system, sans-serif"
+    font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     font-size="${pillFontSize}"
     font-weight="700"
     letter-spacing="-0.02em"

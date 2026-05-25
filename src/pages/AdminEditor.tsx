@@ -1,16 +1,26 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, Save, Eye, Edit, HelpCircle, ChevronDown } from 'lucide-react';
+import remarkGfm from 'remark-gfm';
+import { ArrowLeft, Save, Eye, Edit, HelpCircle, ChevronDown, ImagePlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getPostById, savePost } from '../utils/mockDb';
+import { getPostById, savePost } from '../services/postService';
+import type { BlogPost } from '../types/post';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
 import { isAdminAuthenticated } from '../utils/adminAuth';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import { registerPostTags } from '../utils/postTags';
+import { uploadImage } from '../services/db';
 import { PostTagsInput } from '../components/PostTagsInput';
 import './AdminEditor.css';
+
+const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp';
+
+const imageAltFromFile = (fileName: string): string => {
+  const baseName = fileName.replace(/\.[^.]+$/, '').trim();
+  return baseName.replace(/[-_]+/g, ' ').trim();
+};
 
 export const AdminEditor: React.FC = () => {
   const { t } = useTranslation();
@@ -18,21 +28,61 @@ export const AdminEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const post = useMemo(() => {
-    return id ? getPostById(id) : undefined;
-  }, [id]);
+  const [loadedPost, setLoadedPost] = useState<BlogPost | undefined>(undefined);
+  const [isPostLoading, setIsPostLoading] = useState(Boolean(id));
 
-  const [title, setTitle] = useState(post?.title || '');
-  const [slug, setSlug] = useState(post?.slug || '');
-  const [summary, setSummary] = useState(post?.summary || '');
-  const [selectedTags, setSelectedTags] = useState<string[]>(post?.tags || []);
-  const [content, setContent] = useState(post?.content || '');
-  const [status, setStatus] = useState<'draft' | 'published'>(post?.status || 'draft');
-  const [coverImage, setCoverImage] = useState(post?.coverImage || '');
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [summary, setSummary] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [content, setContent] = useState('');
+  const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [coverImage, setCoverImage] = useState('');
 
-  const [isSlugManual, setIsSlugManual] = useState(!!post);
+  const [isSlugManual, setIsSlugManual] = useState(false);
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
-  const [isEditing] = useState(!!post);
+  const [isEditing] = useState(Boolean(id));
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isUploadingContent, setIsUploadingContent] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const contentImageInputRef = useRef<HTMLInputElement>(null);
+  const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void getPostById(id).then((result) => {
+      if (cancelled) {
+        return;
+      }
+
+      if (result) {
+        setTitle(result.title);
+        setSlug(result.slug);
+        setSummary(result.summary);
+        setSelectedTags(result.tags);
+        setContent(result.content);
+        setStatus(result.status);
+        setCoverImage(result.coverImage);
+        setIsSlugManual(true);
+        setLoadedPost(result);
+      } else {
+        setLoadedPost(undefined);
+      }
+
+      setIsPostLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   useEffect(() => {
     if (loading) {
@@ -44,10 +94,10 @@ export const AdminEditor: React.FC = () => {
       return;
     }
 
-    if (id && !post) {
+    if (id && !isPostLoading && !loadedPost) {
       navigate('/admin');
     }
-  }, [id, loading, navigate, post, user]);
+  }, [id, isPostLoading, loadedPost, loading, navigate, user]);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -71,6 +121,116 @@ export const AdminEditor: React.FC = () => {
     return resolvePostCoverImage(coverImage, title);
   }, [coverImage, title]);
 
+  const insertMarkdownImage = (url: string, alt: string) => {
+    const textarea = contentTextareaRef.current;
+    const snippet = `\n![${alt}](${url})\n`;
+
+    if (!textarea) {
+      setContent((prev) => `${prev}${snippet}`);
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    setContent((prev) => `${prev.slice(0, start)}${snippet}${prev.slice(end)}`);
+
+    const cursor = start + snippet.length;
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(cursor, cursor);
+    });
+  };
+
+  const handleImageUpload = async (file: File, target: 'cover' | 'content') => {
+    setUploadError('');
+
+    if (target === 'cover') {
+      setIsUploadingCover(true);
+    } else {
+      setIsUploadingContent(true);
+    }
+
+    try {
+      const { data, error } = await uploadImage(file);
+
+      if (error || !data?.url) {
+        setUploadError(error?.message ?? t('editor.uploadFailed'));
+        return;
+      }
+
+      if (target === 'cover') {
+        setCoverImage(data.url);
+        return;
+      }
+
+      const alt = imageAltFromFile(file.name) || t('editor.imageAltFallback');
+      insertMarkdownImage(data.url, alt);
+    } catch {
+      setUploadError(t('editor.uploadFailed'));
+    } finally {
+      if (target === 'cover') {
+        setIsUploadingCover(false);
+      } else {
+        setIsUploadingContent(false);
+      }
+    }
+  };
+
+  const handleCoverFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    void handleImageUpload(file, 'cover');
+  };
+
+  const handleContentFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = '';
+    if (files.length === 0) return;
+    void handleContentImagesUpload(files);
+  };
+
+  const handleContentImagesUpload = async (files: File[]) => {
+    setUploadError('');
+    setIsUploadingContent(true);
+
+    const textarea = contentTextareaRef.current;
+    const insertAt = textarea?.selectionStart ?? content.length;
+    const insertEnd = textarea?.selectionEnd ?? content.length;
+    const snippets: string[] = [];
+
+    try {
+      for (const file of files) {
+        const { data, error } = await uploadImage(file);
+
+        if (error || !data?.url) {
+          setUploadError(error?.message ?? t('editor.uploadFailed'));
+          break;
+        }
+
+        const alt = imageAltFromFile(file.name) || t('editor.imageAltFallback');
+        snippets.push(`\n![${alt}](${data.url})\n`);
+      }
+
+      if (snippets.length === 0) {
+        return;
+      }
+
+      const block = snippets.join('');
+      setContent((prev) => `${prev.slice(0, insertAt)}${block}${prev.slice(insertEnd)}`);
+
+      const cursor = insertAt + block.length;
+      requestAnimationFrame(() => {
+        textarea?.focus();
+        textarea?.setSelectionRange(cursor, cursor);
+      });
+    } catch {
+      setUploadError(t('editor.uploadFailed'));
+    } finally {
+      setIsUploadingContent(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -85,7 +245,7 @@ export const AdminEditor: React.FC = () => {
       await registerPostTags(parsedTags);
     }
 
-    savePost({
+    const saved = await savePost({
       id,
       title: title.trim(),
       slug: slug.trim(),
@@ -97,30 +257,35 @@ export const AdminEditor: React.FC = () => {
       author: SITE_AUTHOR.name,
     });
 
+    if (!saved) {
+      alert(t('editor.saveFailed'));
+      return;
+    }
+
     navigate('/admin');
   };
 
   const hasPreviewContent = Boolean(title || content || summary);
 
+  if (isPostLoading) {
+    return null;
+  }
+
   return (
-    <div className="container editor-page fade-in">
-      <nav className="editor-breadcrumb" aria-label="Breadcrumb">
-        <button
-          type="button"
+    <div className="container admin-page editor-page fade-in">
+        <div
           onClick={() => navigate('/admin')}
-          className="post-back-btn"
-          data-testid="btn-post-back"
+          className="post-back-link"
+          data-testid="editor-back-link"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           {t('editor.backToDashboard')}
-        </button>
-     
-      </nav>
+        </div>
 
       <header className="editor-page-header">
         <div className="editor-page-header-text">
-          <h1>{isEditing ? t('editor.editArticle') : t('editor.createArticle')}</h1>
-          <p className="editor-page-subtitle">
+          <h1 className="page-title">{isEditing ? t('editor.editArticle') : t('editor.createArticle')}</h1>
+          <p className="page-subtitle">
             {isEditing ? t('editor.pageSubtitleEdit') : t('editor.pageSubtitleCreate')}
           </p>
         </div>
@@ -241,14 +406,35 @@ export const AdminEditor: React.FC = () => {
                 <label className="form-label" htmlFor="post-cover">
                   {t('editor.coverImage')}
                 </label>
-                <input
-                  id="post-cover"
-                  type="url"
-                  value={coverImage}
-                  onChange={(e) => setCoverImage(e.target.value)}
-                  placeholder={t('editor.coverPlaceholder')}
-                  className="form-input"
-                />
+                <div className="editor-image-field">
+                  <input
+                    id="post-cover"
+                    type="url"
+                    value={coverImage}
+                    onChange={(e) => setCoverImage(e.target.value)}
+                    placeholder={t('editor.coverPlaceholder')}
+                    className="form-input"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-secondary editor-upload-btn"
+                    onClick={() => coverInputRef.current?.click()}
+                    disabled={isUploadingCover}
+                    data-testid="btn-upload-cover"
+                  >
+                    <ImagePlus size={16} aria-hidden="true" />
+                    {isUploadingCover ? t('editor.uploading') : t('editor.uploadCover')}
+                  </button>
+                  <input
+                    ref={coverInputRef}
+                    type="file"
+                    accept={IMAGE_ACCEPT}
+                    className="editor-file-input"
+                    data-testid="input-upload-cover"
+                    onChange={handleCoverFileChange}
+                  />
+                </div>
+                <p className="editor-field-hint">{t('editor.uploadHint')}</p>
               </div>
 
               <div className="form-group">
@@ -283,10 +469,33 @@ export const AdminEditor: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="post-content">
-                  {t('editor.content')}
-                </label>
+                <div className="editor-content-label-row">
+                  <label className="form-label" htmlFor="post-content">
+                    {t('editor.content')}
+                  </label>
+                  <button
+                    type="button"
+                    className="btn btn-secondary editor-upload-btn editor-upload-btn--inline"
+                    onClick={() => contentImageInputRef.current?.click()}
+                    disabled={isUploadingContent}
+                    data-testid="btn-upload-content-image"
+                  >
+                    <ImagePlus size={16} aria-hidden="true" />
+                    {isUploadingContent ? t('editor.uploading') : t('editor.uploadContentImage')}
+                  </button>
+                  <input
+                    ref={contentImageInputRef}
+                    type="file"
+                    accept={IMAGE_ACCEPT}
+                    multiple
+                    className="editor-file-input"
+                    data-testid="input-upload-content-image"
+                    onChange={handleContentFileChange}
+                  />
+                </div>
+                <p className="editor-field-hint editor-field-hint--content">{t('editor.uploadContentHint')}</p>
                 <textarea
+                  ref={contentTextareaRef}
                   id="post-content"
                   rows={15}
                   value={content}
@@ -297,6 +506,12 @@ export const AdminEditor: React.FC = () => {
                   required
                 />
               </div>
+
+              {uploadError && (
+                <p className="editor-upload-error" role="alert">
+                  {uploadError}
+                </p>
+              )}
             </section>
           </form>
         </div>
@@ -343,7 +558,7 @@ export const AdminEditor: React.FC = () => {
               {summary && <p className="preview-summary">{summary}</p>}
 
               <div className="markdown-body">
-                <ReactMarkdown>{content}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
               </div>
             </article>
           )}

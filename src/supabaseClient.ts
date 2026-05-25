@@ -1,13 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { isMockMode, supabaseEnv } from './supabaseConfig';
-
-export { isMockMode } from './supabaseConfig';
+import { isSupabaseConfigured, supabaseEnv } from './supabaseConfig';
 
 let client: SupabaseClient | undefined;
 let clientPromise: Promise<SupabaseClient> | undefined;
 
 export async function getSupabase(): Promise<SupabaseClient> {
-  if (isMockMode) {
+  if (!isSupabaseConfigured) {
     throw new Error('Supabase is not configured.');
   }
 

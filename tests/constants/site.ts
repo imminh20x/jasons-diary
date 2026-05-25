@@ -5,6 +5,7 @@ export const SITE = {
   authorTitle: 'QA/QC Engineer',
   email: 'mailto:you@example.com',
   phone: 'tel:+10000000000',
+  facebook: 'https://facebook.com/your-profile',
   github: 'https://github.com/your-username',
   linkedin: 'https://linkedin.com/in/your-username',
 } as const;

@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, ArrowRight, BookOpen } from 'lucide-react';
-import { getPosts } from '../utils/mockDb';
+import { getPosts } from '../services/postService';
+import type { BlogPost } from '../types/post';
 import { getOptimizedCoverImage } from '../utils/imageUrl';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import './BlogHome.css';
@@ -13,10 +14,20 @@ export const BlogHome: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState(ALL_TAGS);
+  const [publishedPosts, setPublishedPosts] = useState<BlogPost[]>([]);
 
-  // Load posts (only published ones for public view)
-  const publishedPosts = useMemo(() => {
-    return getPosts().filter((post) => post.status === 'published');
+  useEffect(() => {
+    let cancelled = false;
+
+    void getPosts().then((posts) => {
+      if (!cancelled) {
+        setPublishedPosts(posts);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Dynamically extract all available tags from published posts

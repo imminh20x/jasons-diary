@@ -2,8 +2,10 @@ import React, { isValidElement, useMemo, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ArrowLeft } from 'lucide-react';
-import { getPostBySlug } from '../utils/mockDb';
+import { getPostBySlug } from '../services/postService';
+import type { BlogPost as BlogPostData } from '../types/post';
 import { getOptimizedCoverImage } from '../utils/imageUrl';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
@@ -38,10 +40,29 @@ export const BlogPost: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [activeId, setActiveId] = useState<string>('');
+  const [post, setPost] = useState<BlogPostData | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const post = useMemo(() => {
-    if (!slug) return undefined;
-    return getPostBySlug(slug);
+  useEffect(() => {
+    if (!slug) {
+      setPost(undefined);
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+
+    void getPostBySlug(slug).then((result) => {
+      if (!cancelled) {
+        setPost(result);
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   // Extract headings from markdown content for the Table of Contents
@@ -114,6 +135,10 @@ export const BlogPost: React.FC = () => {
     return new Date(dateString).toLocaleDateString(locale, options);
   };
 
+  if (isLoading) {
+    return null;
+  }
+
   if (!post) {
     return (
       <div className="container container-narrow fade-in" style={{ padding: '8rem 1.5rem', textAlign: 'center' }}>
@@ -176,7 +201,7 @@ export const BlogPost: React.FC = () => {
         <div className="container post-body-container">
           <div className="post-content-column">
             <div className="markdown-body">
-              <ReactMarkdown components={markdownComponents}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
                 {post.content}
               </ReactMarkdown>
             </div>

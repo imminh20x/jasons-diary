@@ -89,28 +89,59 @@
       }
     },
     "jobs": {
-      "tripota": {
-        "date": "Tháng 5/2024 - Hiện tại",
-        "role": "QA/QC Engineer",
-        "company": "TripOTA Company",
-        "bullets": [
-          "Phụ trách kiểm thử và đảm bảo chất lượng sản phẩm.",
-          "Tạo và thực thi test case, test plan.",
-          "Tập trung chủ yếu vào E2E testing, API testing và manual testing.",
-          "Nghiên cứu và áp dụng công cụ, framework kiểm thử tự động.",
-          "Triển khai AI workflows để nâng cao hiệu quả kiểm thử."
-        ]
-      },
-      "nfq": {
-        "date": "Tháng 5/2023 - Tháng 5/2024",
-        "role": "Junior .NET Developer",
-        "company": "NFQ Asia",
-        "bullets": [
-          "Phát triển hệ thống API hiệu năng cao bằng .NET Core API với kiến trúc N-Tier.",
-          "Bảo trì và cập nhật codebase để cải thiện hiệu năng và chức năng trong hệ thống ERP.",
-          "Học hỏi và phát triển kỹ năng lập trình viên."
-        ]
-      }
+      "items": [
+        {
+          "date": "Th12/2025 – Hiện tại",
+          "role": "QA/QC – Hệ thống E-Invoice",
+          "company": "TripOTA",
+          "teamSize": "Quy mô team: 8",
+          "bullets": [
+            "Review tài liệu và tư vấn giải pháp cho BA và khách hàng.",
+            "Kiểm thử web thủ công và cơ sở dữ liệu với DBeaver, đảm bảo ứng dụng hoạt động với nhiều nhà cung cấp và người dùng hóa đơn.",
+            "Lập test plan, log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
+            "Đảm bảo hệ thống tích hợp mượt với các ứng dụng khác trong hệ sinh thái du lịch nội bộ.",
+            "Áp dụng Gen AI để sinh test case và phân tích User Story.",
+            "Tự học và triển khai từng bước dự án automation test đầu tiên của công ty."
+          ]
+        },
+        {
+          "date": "Th3/2025 – Th12/2025",
+          "role": "QA/QC – API Tester – API Hub",
+          "company": "TripOTA",
+          "teamSize": "Quy mô team: 5",
+          "bullets": [
+            "Làm việc trực tiếp với Vietnam Airlines, VietJet Air và GDS để xây dựng API hub giúp OTA tích hợp đặt vé hàng không.",
+            "Lập test plan, log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
+            "Triển khai automation data-driven testing với Apidog, đảm bảo độ tin cậy và khả năng mở rộng của hệ thống đặt vé.",
+            "Xây dựng tài liệu kỹ thuật Flight API Hub bằng Docusaurus, AI MCP server và Gen AI cho developer và đối tác tích hợp.",
+            "Thu thập yêu cầu, làm rõ business rules và trao đổi trực tiếp với khách hàng với vai trò BA."
+          ]
+        },
+        {
+          "date": "Th5/2024 – Th3/2025",
+          "role": "Junior QA/QC – Hệ thống TMC",
+          "company": "TripOTA",
+          "teamSize": "Quy mô team: 11",
+          "bullets": [
+            "Gặp trực tiếp khách hàng để thu thập yêu cầu.",
+            "Review tài liệu và tư vấn giải pháp cho BA.",
+            "Log bug trên Azure DevOps, báo cáo hàng ngày, lên lịch và quản lý chất lượng.",
+            "Kiểm thử thủ công các chức năng để đảm bảo ứng dụng hoạt động ổn định."
+          ]
+        },
+        {
+          "date": "Th8/2023 – Th5/2024",
+          "role": "Junior Developer – Hệ thống ERP",
+          "company": "GradiOn Vietnam",
+          "teamSize": "Quy mô team: 10",
+          "bullets": [
+            "Phát triển hệ thống API hiệu năng cao bằng .NET Core API với kiến trúc N-Tier.",
+            "Đảm nhiệm cả developer và QC, duy trì ~90% unit-test coverage với NUnit.",
+            "Kiểm thử API ở mức unit, integration và system.",
+            "Trở thành cố vấn đáng tin cậy, đưa ra insight kinh doanh trực tiếp cho đối tác."
+          ]
+        }
+      ]
     },
     "certs": {
       "education": {
@@ -192,7 +223,15 @@
     "by": "Bởi",
     "justNow": "Vừa xong",
     "requiredAlert": "Tiêu đề, slug và nội dung là bắt buộc.",
-    "noSummary": "Chưa có tóm tắt."
+    "noSummary": "Chưa có tóm tắt.",
+    "uploadCover": "Tải ảnh bìa",
+    "uploadContentImage": "Tải ảnh",
+    "uploading": "Đang tải lên…",
+    "uploadFailed": "Tải ảnh thất bại. Vui lòng thử lại.",
+    "saveFailed": "Không thể lưu bài viết. Vui lòng thử lại.",
+    "uploadHint": "JPEG, PNG hoặc WEBP · tối đa 2MB",
+    "uploadContentHint": "Chọn một hoặc nhiều ảnh cho nội dung bài viết.",
+    "imageAltFallback": "Hình ảnh"
   },
   "common": {
     "backToTop": "Lên đầu trang"

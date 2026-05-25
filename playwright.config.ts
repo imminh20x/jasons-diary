@@ -1,14 +1,26 @@
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
-const testPublicEnv = {
-  VITE_SUPABASE_URL: 'https://your-project-id.supabase.co',
-  VITE_SUPABASE_ANON_KEY: 'your-anon-public-api-key',
-  VITE_CONTACT_EMAIL: 'you@example.com',
-  VITE_CONTACT_PHONE: '+10000000000',
-  VITE_GITHUB_URL: 'https://github.com/your-username',
-  VITE_LINKEDIN_URL: 'https://linkedin.com/in/your-username',
-  VITE_FACEBOOK_URL: '',
-};
+function loadEnvFile(path: string): Record<string, string> {
+  if (!existsSync(path)) {
+    return {};
+  }
+
+  const env: Record<string, string> = {};
+  for (const line of readFileSync(path, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
+    env[key] = value;
+  }
+  return env;
+}
+
+const rootEnv = loadEnvFile(resolve(import.meta.dirname, '.env'));
 
 export default defineConfig({
   testDir: './tests',
@@ -30,7 +42,7 @@ export default defineConfig({
     timeout: 120000,
     env: {
       ...process.env,
-      ...testPublicEnv,
+      ...rootEnv,
     },
   },
   projects: [

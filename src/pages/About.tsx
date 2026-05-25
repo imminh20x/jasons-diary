@@ -42,10 +42,34 @@ const LinkedinIcon = () => (
   </svg>
 );
 
+const FacebookIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="lucide lucide-facebook"
+  >
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+type AboutJob = {
+  date: string;
+  role: string;
+  company: string;
+  teamSize?: string;
+  bullets: string[];
+};
+
 export const About: React.FC = () => {
   const { t } = useTranslation();
-  const tripotaBullets = t('about.jobs.tripota.bullets', { returnObjects: true }) as string[];
-  const nfqBullets = t('about.jobs.nfq.bullets', { returnObjects: true }) as string[];
+  const jobs = t('about.jobs.items', { returnObjects: true }) as AboutJob[];
 
   return (
     <div className="about-page fade-in">
@@ -61,7 +85,7 @@ export const About: React.FC = () => {
             />
           </div>
           <div className="about-hero-text">
-            <span className="about-eyebrow">{t('about.eyebrow')}</span>
+            <span className="about-eyebrow about-availability-badge">{t('about.eyebrow')}</span>
             <h1 className="about-name" data-testid="about-name">{t('about.name')}</h1>
             <p className="about-title">{t('about.title')}</p>
             <p className="about-bio">{t('about.bio')}</p>
@@ -70,6 +94,17 @@ export const About: React.FC = () => {
               {hasContactEmail() && (
               <a href={contactEmailHref()} className="btn btn-primary" data-testid="btn-contact-email">
                 <Mail size={16} /> {t('about.contactMe')}
+              </a>
+              )}
+              {SITE_CONTACT.facebook && (
+              <a
+                href={SITE_CONTACT.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                data-testid="link-facebook"
+              >
+                <FacebookIcon /> Facebook <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
               </a>
               )}
               {SITE_CONTACT.github && (
@@ -156,37 +191,26 @@ export const About: React.FC = () => {
             </div>
 
             <div className="timeline">
-              <div className="timeline-item">
-                <div className="timeline-badge">
-                  <Briefcase size={16} />
+              {jobs.map((job) => (
+                <div key={`${job.company}-${job.role}-${job.date}`} className="timeline-item">
+                  <div className="timeline-badge">
+                    <Briefcase size={16} />
+                  </div>
+                  <div className="timeline-content">
+                    <span className="timeline-date">{job.date}</span>
+                    <h4 className="timeline-role">{job.role}</h4>
+                    <h5 className="timeline-company">
+                      {job.company}
+                      {job.teamSize ? <span className="timeline-team-size"> · {job.teamSize}</span> : null}
+                    </h5>
+                    <ul className="timeline-desc-list">
+                      {job.bullets.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <div className="timeline-content">
-                  <span className="timeline-date">{t('about.jobs.tripota.date')}</span>
-                  <h4 className="timeline-role">{t('about.jobs.tripota.role')}</h4>
-                  <h5 className="timeline-company">{t('about.jobs.tripota.company')}</h5>
-                  <ul className="timeline-desc-list">
-                    {tripotaBullets.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-badge">
-                  <Briefcase size={16} />
-                </div>
-                <div className="timeline-content">
-                  <span className="timeline-date">{t('about.jobs.nfq.date')}</span>
-                  <h4 className="timeline-role">{t('about.jobs.nfq.role')}</h4>
-                  <h5 className="timeline-company">{t('about.jobs.nfq.company')}</h5>
-                  <ul className="timeline-desc-list">
-                    {nfqBullets.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 

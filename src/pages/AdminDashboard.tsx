@@ -3,8 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus, Edit2, Trash2, Globe, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getPosts, deletePost } from '../utils/mockDb';
-import type { Post } from '../utils/mockDb';
+import { getPosts, deletePost } from '../services/postService';
+import type { BlogPost } from '../types/post';
 import { isAdminAuthenticated } from '../utils/adminAuth';
 import './AdminDashboard.css';
 
@@ -12,10 +12,26 @@ export const AdminDashboard: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [posts, setPosts] = useState<Post[]>(() => {
-    return isAdminAuthenticated(user) ? getPosts() : [];
-  });
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [activeTab, setActiveTab] = useState<'all' | 'published' | 'draft'>('all');
+
+  useEffect(() => {
+    if (loading || !isAdminAuthenticated(user)) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void getPosts({ includeDrafts: true }).then((loadedPosts) => {
+      if (!cancelled) {
+        setPosts(loadedPosts);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, user]);
 
   // Authentication check
   useEffect(() => {
@@ -44,8 +60,13 @@ export const AdminDashboard: React.FC = () => {
 
   const handleDelete = (id: string, title: string) => {
     if (window.confirm(t('dashboard.deleteConfirm', { title }))) {
-      deletePost(id);
-      setPosts(getPosts()); // refresh the state
+      void deletePost(id).then((deleted) => {
+        if (!deleted) {
+          return;
+        }
+
+        void getPosts({ includeDrafts: true }).then(setPosts);
+      });
     }
   };
 
@@ -56,13 +77,11 @@ export const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="container fade-in" style={{ paddingBottom: '5rem' }}>
+    <div className="container admin-page fade-in" style={{ paddingBottom: '5rem' }}>
       <header className="dashboard-header">
         <div>
-          <h1 style={{ margin: 0 }}>{t('dashboard.title')}</h1>
-          <p style={{ color: 'var(--color-text-muted)', margin: '0.25rem 0 0 0' }}>
-            {t('dashboard.subtitle')}
-          </p>
+          <h1 className="page-title">{t('dashboard.title')}</h1>
+          <p className="page-subtitle">{t('dashboard.subtitle')}</p>
         </div>
         <Link
           to="/admin/new"
@@ -118,7 +137,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Table container */}
       <div className="table-container">
         {filteredPosts.length === 0 ? (
-          <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          <div className="dashboard-empty-state">
             <AlertCircle size={40} style={{ marginBottom: '1rem', opacity: 0.5 }} />
             <h3>{t('dashboard.noArticlesTitle')}</h3>
             <p>{t('dashboard.noArticlesDesc')}</p>
@@ -162,7 +181,7 @@ export const AdminDashboard: React.FC = () => {
                       </span>
                     ))}
                   </td>
-                  <td style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                  <td className="dashboard-date-cell">
                     {formatDate(post.publishedAt)}
                   </td>
                   <td>

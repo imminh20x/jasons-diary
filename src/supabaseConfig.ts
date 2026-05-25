@@ -11,13 +11,16 @@ const isPlaceholder = (val: string | undefined): boolean => {
   );
 };
 
-export const isMockMode = isPlaceholder(supabaseUrl) || isPlaceholder(supabaseAnonKey);
+export const isSupabaseConfigured =
+  !isPlaceholder(supabaseUrl) && !isPlaceholder(supabaseAnonKey);
 
 export const supabaseEnv = {
   url: supabaseUrl ?? '',
   anonKey: supabaseAnonKey ?? '',
 } as const;
 
-if (isMockMode) {
-  console.warn('Supabase env variables are missing or placeholders. Using mock backend fallback.');
+if (!isSupabaseConfigured) {
+  console.error(
+    'Supabase is required. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env, then restart the dev server.',
+  );
 }

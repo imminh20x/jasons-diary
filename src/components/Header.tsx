@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sun, Moon, ShieldAlert, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { isAdminAuthenticated, setLocalMockAuthenticated } from '../utils/adminAuth';
+import { isAdminAuthenticated } from '../utils/adminAuth';
 import { SiteLogo } from './SiteLogo';
 import './Header.css';
 
@@ -126,7 +126,6 @@ export const Header: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    setLocalMockAuthenticated(false);
     await logout();
     setIsLoggedIn(false);
     window.location.href = '/';

@@ -66,7 +66,7 @@ const anonKey = process.env.VITE_SUPABASE_ANON_KEY ?? fileEnv.VITE_SUPABASE_ANON
 console.log('Supabase connection check\n');
 
 if (!existsSync(ENV_PATH)) {
-  console.log('⚠  No .env file found. Copy .env.example to .env first.');
+  console.log('⚠  No .env file found. Create .env with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
 }
 
 if (isPlaceholder(url) || isPlaceholder(anonKey)) {

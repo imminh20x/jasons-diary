@@ -18,6 +18,9 @@ test.describe('About Me Portfolio Page E2E', () => {
     await expect(aboutPage.emailLink).toBeVisible();
     await expect(aboutPage.emailLink).toHaveAttribute('href', SITE.email);
 
+    await expect(aboutPage.facebookLink).toBeVisible();
+    await expect(aboutPage.facebookLink).toHaveAttribute('href', SITE.facebook);
+
     await expect(aboutPage.githubLink).toBeVisible();
     await expect(aboutPage.githubLink).toHaveAttribute('href', SITE.github);
 
@@ -37,8 +40,9 @@ test.describe('About Me Portfolio Page E2E', () => {
 
   test('should display professional journey timeline', async ({ page }) => {
     await expect(page.getByText('Experience', { exact: true })).toBeVisible();
-    await expect(page.locator('.timeline').getByText('TripOTA Company')).toBeVisible();
-    await expect(page.locator('.timeline-role').filter({ hasText: 'QA/QC Engineer' }).first()).toBeVisible();
+    await expect(page.locator('.timeline').getByText('TripOTA').first()).toBeVisible();
+    await expect(page.locator('.timeline-role').filter({ hasText: /E-Invoice/i }).first()).toBeVisible();
+    await expect(page.getByText('GradiOn Vietnam')).toBeVisible();
     await expect(page.getByText('Can Tho University')).toBeVisible();
     await expect(page.getByText('Software Engineering')).toBeVisible();
   });

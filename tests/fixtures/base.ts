@@ -35,7 +35,6 @@ export const test = base.extend<Pages>({
     await use(new PostDetailPage(page));
   },
 
-  // Setup diagnostic monitoring as an auto-use fixture
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('app_language', 'en');
@@ -48,10 +47,9 @@ export const test = base.extend<Pages>({
     const pageErrors: Error[] = [];
     const failedRequests: string[] = [];
 
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       const text = msg.text();
-      // Ignore normal expected warnings or browser warnings
-      if (text.includes('Supabase env variables are missing') || text.includes('[locatorjs]')) {
+      if (text.includes('[locatorjs]') || text.includes('Supabase is required')) {
         return;
       }
       if (msg.type() === 'error') {
@@ -59,11 +57,11 @@ export const test = base.extend<Pages>({
       }
     });
 
-    page.on('pageerror', err => {
+    page.on('pageerror', (err) => {
       pageErrors.push(err);
     });
 
-    page.on('response', response => {
+    page.on('response', (response) => {
       const status = response.status();
       if (status >= 400) {
         failedRequests.push(`${response.url()} (Status ${status})`);
@@ -72,11 +70,10 @@ export const test = base.extend<Pages>({
 
     await use(page);
 
-    // Assert diagnostics in teardown
     expect(pageErrors).toEqual([]);
     expect(failedRequests).toEqual([]);
     expect(consoleMessages).toEqual([]);
-  }
+  },
 });
 
 export { expect } from '@playwright/test';

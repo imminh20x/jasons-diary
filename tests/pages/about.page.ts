@@ -5,6 +5,7 @@ export class AboutPage {
   readonly nameHeading: Locator;
   readonly avatarImage: Locator;
   readonly emailLink: Locator;
+  readonly facebookLink: Locator;
   readonly githubLink: Locator;
   readonly linkedinLink: Locator;
 
@@ -13,6 +14,7 @@ export class AboutPage {
     this.nameHeading = page.getByTestId('about-name');
     this.avatarImage = page.locator('.about-avatar-img');
     this.emailLink = page.getByTestId('btn-contact-email');
+    this.facebookLink = page.getByTestId('link-facebook');
     this.githubLink = page.getByTestId('link-github');
     this.linkedinLink = page.getByTestId('link-linkedin');
   }

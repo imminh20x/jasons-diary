@@ -3,14 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { isMockMode } from '../supabaseConfig';
-import {
-  clearStaleMockAuth,
-  isAdminAuthenticated,
-  isDevMockAuthEnabled,
-  setLocalMockAuthenticated,
-  validateDevMockLogin,
-} from '../utils/adminAuth';
+import { isAdminAuthenticated } from '../utils/adminAuth';
 import './Login.css';
 
 export const Login: React.FC = () => {
@@ -23,10 +16,8 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    clearStaleMockAuth();
-
     if (isAdminAuthenticated(user)) {
-      navigate('/admin');
+      navigate('/admin', { replace: true });
     }
   }, [navigate, user]);
 
@@ -39,37 +30,16 @@ export const Login: React.FC = () => {
       return;
     }
 
-    if (isDevMockAuthEnabled) {
-      if (validateDevMockLogin(email, password)) {
-        setLocalMockAuthenticated(true);
-        navigate('/admin');
-        return;
-      }
-
-      setError(t('login.errors.invalidDev'));
-      return;
-    }
-
-    if (isMockMode) {
-      setError(t('login.errors.unavailable'));
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       const { error: loginError } = await login(email, password);
       if (loginError) {
         setError(t('login.errors.invalid'));
-        return;
       }
-
-      navigate('/admin');
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const adminUnavailable = isMockMode && !isDevMockAuthEnabled;
 
   return (
     <div className="login-container fade-in">
@@ -97,12 +67,6 @@ export const Login: React.FC = () => {
           </div>
         )}
 
-        {adminUnavailable && (
-          <div className="login-error" role="status">
-            {t('login.errors.unavailable')}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">
@@ -116,7 +80,6 @@ export const Login: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="form-input"
               data-testid="input-login-email"
-              disabled={adminUnavailable}
               required
             />
           </div>
@@ -133,7 +96,6 @@ export const Login: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="form-input"
               data-testid="input-login-password"
-              disabled={adminUnavailable}
               required
             />
           </div>
@@ -143,23 +105,11 @@ export const Login: React.FC = () => {
             className="btn btn-primary"
             style={{ width: '100%', padding: '0.8rem' }}
             data-testid="btn-login-submit"
-            disabled={adminUnavailable || isSubmitting}
+            disabled={isSubmitting}
           >
             {t('login.signIn')}
           </button>
         </form>
-
-        {isDevMockAuthEnabled && (
-          <div className="login-helper">
-            <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text-highlight)' }}>
-              {t('login.demoCredentials')}
-            </p>
-            <code style={{ display: 'block', marginTop: '0.4rem', padding: '0.3rem', fontSize: '0.8125rem' }}>
-              Email: admin@blog.com <br />
-              Password: password
-            </code>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ A modern personal blog built with React and Vite. It includes a public reading e
 - Dashboard to list, filter, edit, and delete posts (draft / published)
 - Rich **post editor** with live Markdown preview
 - **Auto-generated cover images** — mesh gradient background + title when no cover URL is provided
-- **Reusable post tags** — search existing tags or create new ones; stored in Supabase (`post_tags`) or localStorage in mock mode
+- **Reusable post tags** — search existing tags or create new ones; stored in Supabase (`post_tags`)
 - Auto-slug generation from title
 
 ### Developer experience
@@ -29,7 +29,7 @@ A modern personal blog built with React and Vite. It includes a public reading e
 - TypeScript + ESLint
 - Playwright E2E tests (visitor, admin, create-post flows)
 - Lazy-loaded routes for smaller initial bundle
-- Mock mode for local development without Supabase
+- Supabase-backed posts, auth, tags, and image storage
 
 ---
 
@@ -43,7 +43,7 @@ A modern personal blog built with React and Vite. It includes a public reading e
 | Styling            | CSS (custom design tokens)         |
 | Content            | Markdown (`react-markdown`)        |
 | i18n               | i18next / react-i18next            |
-| Backend (optional) | Supabase (Auth, Postgres, Storage) |
+| Backend              | Supabase (Auth, Postgres, Storage) |
 | Testing            | Playwright                         |
 | Deploy             | Vercel                             |
 
@@ -68,6 +68,8 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173).
 
+Create a `.env` file with your Supabase credentials (see [Supabase setup](#supabase-setup) below) before using the admin CMS or loading posts.
+
 ### Build for production
 
 ```bash
@@ -77,41 +79,9 @@ npm run preview
 
 ---
 
-## Mock mode vs Supabase
-
-The app detects whether Supabase is configured via environment variables.
-
-
-| Mode         | When                                                 | Data storage                |
-| ------------ | ---------------------------------------------------- | --------------------------- |
-| **Mock**     | `.env` missing or still has placeholder values       | `localStorage` (`mockDb`)   |
-| **Supabase** | Valid `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` | Supabase Postgres + Storage |
-
-
-Copy the example env file:
-
-```bash
-cp .env.example .env
-```
-
-### Admin login (mock mode, development only)
-
-When Supabase is not configured **and** you run `npm run dev`:
-
-
-| Email               | Password   |
-| ------------------- | ---------- |
-| `admin@blog.com`    | `password` |
-| `admin@example.com` | `admin`    |
-
-
-Mock admin auth is **disabled in production builds** for security.
-
-Admin routes: `/login` → `/admin` → `/admin/new`
-
----
-
 ## Supabase setup
+
+Supabase is **required**. The app reads and writes all posts through your Supabase project.
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Run SQL in the dashboard (**SQL Editor**):
@@ -119,7 +89,7 @@ Admin routes: `/login` → `/admin` → `/admin/new`
   - Run `supabase/schema.sql` — `posts`, `post_tags`, RLS policies
   - Run `supabase/storage.sql` — `blog-images` bucket
 3. Create an admin user: **Authentication → Users → Add user**
-4. Fill in `.env` (copy from `.env.example`):
+4. Create `.env` in the project root:
 
 ```env
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
@@ -130,13 +100,22 @@ VITE_GITHUB_URL=https://github.com/your-username
 VITE_LINKEDIN_URL=https://linkedin.com/in/your-username
 ```
 
-1. Verify connection:
+For Playwright admin tests, also add:
+
+```env
+TEST_ADMIN_EMAIL=you@example.com
+TEST_ADMIN_PASSWORD=your-supabase-user-password
+```
+
+5. Verify connection:
 
 ```bash
 npm run check:supabase
 ```
 
-1. Restart the dev server: `npm run dev`
+6. Restart the dev server: `npm run dev`
+
+Admin routes: `/login` → `/admin` → `/admin/new`
 
 ---
 
@@ -148,7 +127,7 @@ npm run check:supabase
 │   ├── pages/              # BlogHome, BlogPost, AdminEditor, …
 │   ├── context/            # AuthContext
 │   ├── services/           # Supabase data layer (db.ts)
-│   ├── utils/              # mockDb, cover generator, post tags, …
+│   ├── utils/              # cover generator, post tags, …
 │   ├── i18n/               # en.json, vi.json
 │   └── constants/          # Site author info
 ├── supabase/               # schema.sql, storage.sql
@@ -194,10 +173,10 @@ Test suites:
 
 1. Push to GitHub
 2. Import the repo in [Vercel](https://vercel.com)
-3. Add environment variables in Vercel (see `.env.example` and [SECURITY.md](./SECURITY.md))
+3. Add environment variables in Vercel (see [SECURITY.md](./SECURITY.md))
 4. Deploy — `vercel.json` handles SPA routing
 
-Without Supabase env vars on Vercel, the production site runs in mock mode (localStorage per browser — not suitable for a real multi-user CMS).
+Redeploy after changing env vars — Vite inlines them at build time.
 
 ---
 
@@ -206,7 +185,7 @@ Without Supabase env vars on Vercel, the production site runs in mock mode (loca
 **Cloning this repo does not access the original author's live data.**
 
 - Secrets and personal contact info live in `.env` / Vercel env vars (gitignored), not in source code.
-- Mock mode stores posts in **each visitor's browser** (`localStorage`) — fully isolated per clone.
+- Posts and tags live in **your** Supabase project — each deployment needs its own credentials.
 - Supabase mode requires **your own** project URL, anon key, and admin user.
 - RLS restricts write access to a single admin email configured in `supabase/schema.sql`.
 
