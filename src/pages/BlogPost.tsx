@@ -1,15 +1,17 @@
-import React, { isValidElement, useMemo, useEffect, useState } from 'react';
+import React, { isValidElement, memo, useMemo, useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ArrowLeft } from 'lucide-react';
-import { getPostBySlug } from '../services/postService';
+import { getCachedPostBySlug, getPostBySlug } from '../services/postService';
 import type { BlogPost as BlogPostData } from '../types/post';
 import { getOptimizedCoverImage } from '../utils/imageUrl';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
 import './BlogPost.css';
+
+type TocHeading = { id: string; text: string; level: number };
 
 // Helper function to recursively extract text content from React nodes
 const getInnerText = (node: React.ReactNode): string => {
@@ -36,27 +38,119 @@ const markdownComponents = {
   },
 };
 
+const PostMarkdown = memo(function PostMarkdown({ content }: { content: string }) {
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      {content}
+    </ReactMarkdown>
+  );
+});
+
+const TableOfContents = memo(function TableOfContents({
+  headings,
+  activeId,
+  title,
+  onSelect,
+}: {
+  headings: TocHeading[];
+  activeId: string;
+  title: string;
+  onSelect: (id: string) => void;
+}) {
+  if (headings.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="toc-card">
+      <h3 className="toc-title">{title}</h3>
+      <div className="toc-scroll">
+        <ul className="toc-list">
+          {headings.map((heading) => (
+            <li
+              key={heading.id}
+              onClick={() => onSelect(heading.id)}
+              className={`toc-item toc-item-h${heading.level} ${activeId === heading.id ? 'active' : ''}`}
+            >
+              {heading.text}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+});
+
+const PostDetailSkeleton = () => (
+  <div className="post-detail-page post-detail-page--loading" aria-busy="true" aria-label="Loading post">
+    <section className="post-header-banner">
+      <div className="container post-header-banner-container">
+        <div className="post-header-grid">
+          <div className="post-header-info">
+            <div className="post-skeleton post-skeleton-line post-skeleton-line--sm" />
+            <div className="post-skeleton post-skeleton-line post-skeleton-line--title" />
+            <div className="post-skeleton post-skeleton-line post-skeleton-line--summary" />
+            <div className="post-skeleton post-skeleton-line post-skeleton-line--summary post-skeleton-line--short" />
+            <div className="post-skeleton post-skeleton-author" />
+          </div>
+          <div className="post-header-cover">
+            <div className="post-skeleton post-skeleton-cover" />
+          </div>
+        </div>
+      </div>
+    </section>
+    <section className="post-body-section">
+      <div className="container post-body-container">
+        <div className="post-content-column">
+          <div className="post-skeleton post-skeleton-line" />
+          <div className="post-skeleton post-skeleton-line" />
+          <div className="post-skeleton post-skeleton-line post-skeleton-line--short" />
+        </div>
+      </div>
+    </section>
+  </div>
+);
+
+const extractHeadings = (content: string): TocHeading[] => {
+  const lines = content.split('\n');
+  const extracted: TocHeading[] = [];
+
+  lines.forEach((line) => {
+    const match = line.match(/^(#{2,3})\s+(.*)$/);
+    if (match) {
+      const level = match[1].length;
+      const text = match[2].replace(/[#*`[\]]/g, '').trim();
+      const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      extracted.push({ id, text, level });
+    }
+  });
+
+  return extracted;
+};
+
 export const BlogPost: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const [activeId, setActiveId] = useState<string>('');
-  const [post, setPost] = useState<BlogPostData | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [fetchedPost, setFetchedPost] = useState<BlogPostData | undefined>();
+  const [resolvedSlug, setResolvedSlug] = useState<string | null>(null);
+
+  const cachedPost = slug ? getCachedPostBySlug(slug) : undefined;
+  const post =
+    cachedPost ?? (fetchedPost?.slug === slug ? fetchedPost : undefined);
+  const isLoading = Boolean(slug) && !post && resolvedSlug !== slug;
 
   useEffect(() => {
-    if (!slug) {
-      setPost(undefined);
-      setIsLoading(false);
+    if (!slug || getCachedPostBySlug(slug)) {
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
 
     void getPostBySlug(slug).then((result) => {
       if (!cancelled) {
-        setPost(result);
-        setIsLoading(false);
+        setFetchedPost(result);
+        setResolvedSlug(slug);
       }
     });
 
@@ -65,28 +159,12 @@ export const BlogPost: React.FC = () => {
     };
   }, [slug]);
 
-  // Extract headings from markdown content for the Table of Contents
-  const headings = useMemo(() => {
-    if (!post) return [];
-    const lines = post.content.split('\n');
-    const extracted: { id: string; text: string; level: number }[] = [];
+  const headings = useMemo(() => (post ? extractHeadings(post.content) : []), [post]);
 
-    lines.forEach((line) => {
-      // Look for h2 (##) or h3 (###)
-      const match = line.match(/^(#{2,3})\s+(.*)$/);
-      if (match) {
-        const level = match[1].length;
-        const text = match[2].replace(/[#*`[\]]/g, '').trim();
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        extracted.push({ id, text, level });
-      }
-    });
-    return extracted;
-  }, [post]);
-
-  // Highlight active heading on scroll
   useEffect(() => {
-    if (headings.length === 0) return;
+    if (headings.length === 0) {
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -96,7 +174,7 @@ export const BlogPost: React.FC = () => {
           }
         });
       },
-      { rootMargin: '-80px 0px -60% 0px', threshold: 0.1 }
+      { rootMargin: '-80px 0px -60% 0px', threshold: 0.1 },
     );
 
     headings.forEach((heading) => {
@@ -110,24 +188,26 @@ export const BlogPost: React.FC = () => {
         if (el) observer.unobserve(el);
       });
     };
-  }, [headings, post]);
+  }, [headings]);
 
-  const scrollToHeading = (id: string) => {
+  const scrollToHeading = useCallback((id: string) => {
     const element = document.getElementById(id);
-    if (element) {
-      const offset = 90; // offset for sticky header
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-      setActiveId(id);
+    if (!element) {
+      return;
     }
-  };
+
+    const offset = 90;
+    const bodyRect = document.body.getBoundingClientRect().top;
+    const elementRect = element.getBoundingClientRect().top;
+    const elementPosition = elementRect - bodyRect;
+    const offsetPosition = elementPosition - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth',
+    });
+    setActiveId(id);
+  }, []);
 
   const formatDate = (dateString: string) => {
     const locale = i18n.language.startsWith('vi') ? 'vi-VN' : 'en-US';
@@ -136,10 +216,10 @@ export const BlogPost: React.FC = () => {
   };
 
   if (isLoading) {
-    return null;
+    return <PostDetailSkeleton />;
   }
 
-  if (!post) {
+  if (!slug || !post) {
     return (
       <div className="container container-narrow fade-in" style={{ padding: '8rem 1.5rem', textAlign: 'center' }}>
         <h2>{t('post.notFoundTitle')}</h2>
@@ -152,7 +232,7 @@ export const BlogPost: React.FC = () => {
   }
 
   return (
-    <div className="fade-in post-detail-page">
+    <div className="post-detail-page">
       <section className="post-header-banner">
         <div className="container post-header-banner-container">
           <div className="post-header-grid">
@@ -201,9 +281,7 @@ export const BlogPost: React.FC = () => {
         <div className="container post-body-container">
           <div className="post-content-column">
             <div className="markdown-body">
-              <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-                {post.content}
-              </ReactMarkdown>
+              <PostMarkdown content={post.content} />
             </div>
 
             <div className="author-box">
@@ -222,24 +300,12 @@ export const BlogPost: React.FC = () => {
           </div>
 
           <aside className="post-sidebar" role="complementary">
-            {headings.length > 0 && (
-              <div className="toc-card">
-                <h3 className="toc-title">{t('post.tableOfContents')}</h3>
-                <div className="toc-scroll">
-                  <ul className="toc-list">
-                    {headings.map((heading) => (
-                      <li
-                        key={heading.id}
-                        onClick={() => scrollToHeading(heading.id)}
-                        className={`toc-item toc-item-h${heading.level} ${activeId === heading.id ? 'active' : ''}`}
-                      >
-                        {heading.text}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
+            <TableOfContents
+              headings={headings}
+              activeId={activeId}
+              title={t('post.tableOfContents')}
+              onSelect={scrollToHeading}
+            />
           </aside>
         </div>
       </section>

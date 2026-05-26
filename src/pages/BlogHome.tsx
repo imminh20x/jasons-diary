@@ -10,18 +10,72 @@ import './BlogHome.css';
 
 const ALL_TAGS = 'all';
 
+const HomePostsSkeleton: React.FC = () => (
+  <>
+    <div className="skeleton-featured card">
+      <div className="skeleton-block skeleton-featured-image" />
+      <div className="skeleton-featured-content">
+        <div className="skeleton-block skeleton-line skeleton-line-sm" />
+        <div className="skeleton-block skeleton-line skeleton-line-lg" />
+        <div className="skeleton-block skeleton-line skeleton-line-md" />
+        <div className="skeleton-block skeleton-line skeleton-line-md" />
+      </div>
+    </div>
+
+    <div className="latest-section">
+      <div className="section-divider">
+        <div className="skeleton-block skeleton-line skeleton-line-sm skeleton-section-label" />
+        <div className="divider-line" />
+      </div>
+      <div className="latest-grid">
+        {[0, 1].map((index) => (
+          <div key={index} className="skeleton-card card">
+            <div className="skeleton-block skeleton-card-image" />
+            <div className="skeleton-card-content">
+              <div className="skeleton-block skeleton-line skeleton-line-xs" />
+              <div className="skeleton-block skeleton-line skeleton-line-md" />
+              <div className="skeleton-block skeleton-line skeleton-line-sm" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="more-section">
+      <div className="section-divider">
+        <div className="skeleton-block skeleton-line skeleton-line-sm skeleton-section-label" />
+        <div className="divider-line" />
+      </div>
+      <div className="more-grid">
+        {[0, 1, 2].map((index) => (
+          <div key={index} className="skeleton-card card">
+            <div className="skeleton-block skeleton-card-image" />
+            <div className="skeleton-card-content">
+              <div className="skeleton-block skeleton-line skeleton-line-xs" />
+              <div className="skeleton-block skeleton-line skeleton-line-sm" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </>
+);
+
 export const BlogHome: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState(ALL_TAGS);
   const [publishedPosts, setPublishedPosts] = useState<BlogPost[]>(() => getCachedPosts() ?? []);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(() => !getCachedPosts()?.length);
 
   useEffect(() => {
     let cancelled = false;
+    const hadCache = Boolean(getCachedPosts()?.length);
 
-    void getPosts().then((posts) => {
+    void getPosts({ revalidate: hadCache }).then((posts) => {
       if (!cancelled) {
         setPublishedPosts(posts);
+        setIsLoadingPosts(false);
       }
     });
 
@@ -196,6 +250,15 @@ export const BlogHome: React.FC = () => {
               </div>
             )}
           </div>
+        ) : isLoadingPosts ? (
+          <section
+            className="home-posts-skeleton"
+            data-testid="home-posts-loading"
+            aria-busy="true"
+            aria-label={t('home.loadingPosts')}
+          >
+            <HomePostsSkeleton />
+          </section>
         ) : (
           /* Case: Default Home Layout */
           <div>

@@ -31,7 +31,8 @@
     "featured": "Featured",
     "latest": "Latest",
     "moreArticles": "More articles",
-    "readArticle": "Read Article"
+    "readArticle": "Read Article",
+    "loadingPosts": "Loading articles"
   },
   "post": {
     "notFoundTitle": "Post Not Found",

@@ -499,6 +499,135 @@
   color: var(--color-primary);
 }
 
+/* Loading skeleton */
+.home-posts-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.skeleton-block {
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-muted) 0%,
+    var(--color-border) 50%,
+    var(--color-bg-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: home-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes home-skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block {
+    animation: none;
+    background: var(--color-bg-muted);
+  }
+}
+
+.skeleton-featured {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  padding: 1rem;
+  margin-bottom: 3.5rem;
+  pointer-events: none;
+}
+
+.skeleton-featured-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-featured-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.skeleton-line {
+  height: 0.875rem;
+}
+
+.skeleton-line-xs {
+  width: 35%;
+}
+
+.skeleton-line-sm {
+  width: 45%;
+}
+
+.skeleton-line-md {
+  width: 75%;
+}
+
+.skeleton-line-lg {
+  width: 90%;
+  height: 1.25rem;
+}
+
+.skeleton-section-label {
+  width: 6rem;
+  height: 0.75rem;
+}
+
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+}
+
+.skeleton-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .skeleton-featured {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .skeleton-featured-image {
+    width: 50%;
+    height: 18.75rem;
+    aspect-ratio: auto;
+    flex-shrink: 0;
+  }
+
+  .skeleton-featured-content {
+    width: 50%;
+    justify-content: center;
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .skeleton-featured-image,
+  .skeleton-featured-content {
+    height: 21.25rem;
+  }
+}
+
 /* Empty search state */
 .empty-state {
   text-align: center;

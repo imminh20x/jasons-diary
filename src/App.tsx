@@ -3,9 +3,9 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { BackToTop } from './components/BackToTop';
-
-const BlogHome = lazy(() => import('./pages/BlogHome').then((m) => ({ default: m.BlogHome })));
-const BlogPost = lazy(() => import('./pages/BlogPost').then((m) => ({ default: m.BlogPost })));
+import { BlogHome } from './pages/BlogHome';
+import { BlogPost } from './pages/BlogPost';
+import { prefetchPublishedPosts } from './services/postService';
 const About = lazy(() => import('./pages/About').then((m) => ({ default: m.About })));
 const Login = lazy(() => import('./pages/Login').then((m) => ({ default: m.Login })));
 const AdminDashboard = lazy(() =>
@@ -27,9 +27,18 @@ function RouteFallback() {
   return <div className="route-loading" aria-hidden="true" />;
 }
 
+function PostsWarmup() {
+  useEffect(() => {
+    void prefetchPublishedPosts();
+  }, []);
+
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <PostsWarmup />
       <ScrollToTop />
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Header />

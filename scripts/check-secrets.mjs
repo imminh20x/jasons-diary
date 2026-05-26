@@ -7,6 +7,11 @@ const ROOT = resolve(import.meta.dirname, '..');
 const FORBIDDEN_PATTERNS = [
   { label: 'Gmail address', pattern: /imminh20x@gmail\.com/i },
   { label: 'Personal phone', pattern: /\+84899690883|899\s*690\s*883/i },
+  { label: 'Supabase publishable key', pattern: /sb_publishable_[A-Za-z0-9_]+/ },
+  {
+    label: 'Supabase project URL',
+    pattern: /https:\/\/(?!your-project-id)[a-z0-9]{8,}\.supabase\.co/i,
+  },
   { label: 'Service role key', pattern: /service_role/i, skipMarkdown: true },
   { label: 'Private Supabase JWT', pattern: /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/ },
 ];

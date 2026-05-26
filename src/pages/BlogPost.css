@@ -340,3 +340,74 @@
   border: 1px solid var(--color-border);
   flex-shrink: 0;
 }
+
+/* Loading skeleton — avoids blank flash while fetching post */
+.post-detail-page--loading {
+  pointer-events: none;
+}
+
+.post-skeleton {
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-muted) 0%,
+    var(--color-border) 50%,
+    var(--color-bg-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: postSkeletonShimmer 1.2s ease-in-out infinite;
+}
+
+.post-skeleton-line {
+  height: 1rem;
+  margin-bottom: 0.875rem;
+}
+
+.post-skeleton-line--sm {
+  width: 8rem;
+  height: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.post-skeleton-line--title {
+  height: 2.5rem;
+  width: min(100%, 28rem);
+  margin-bottom: 1rem;
+}
+
+.post-skeleton-line--summary {
+  height: 1rem;
+  width: min(100%, 36rem);
+}
+
+.post-skeleton-line--short {
+  width: min(100%, 24rem);
+  margin-bottom: 1.5rem;
+}
+
+.post-skeleton-author {
+  width: 12rem;
+  height: 3.5rem;
+  border-radius: var(--radius-lg);
+}
+
+.post-skeleton-cover {
+  width: 100%;
+  aspect-ratio: 563 / 338;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes postSkeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-skeleton {
+    animation: none;
+  }
+}

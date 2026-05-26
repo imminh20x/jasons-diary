@@ -15,23 +15,118 @@ type PostsCacheKey = 'published' | 'all';
 
 const postsCache = new Map<PostsCacheKey, BlogPost[]>();
 const postsInflight = new Map<PostsCacheKey, Promise<BlogPost[]>>();
+const postsBySlugCache = new Map<string, BlogPost>();
+const postBySlugInflight = new Map<string, Promise<BlogPost | undefined>>();
+
+const SESSION_PUBLISHED_POSTS_KEY = 'blog_published_posts_v1';
 
 const cacheKey = (options?: { includeDrafts?: boolean }): PostsCacheKey =>
   options?.includeDrafts ? 'all' : 'published';
+
+const stripContentForListCache = (posts: BlogPost[]): Omit<BlogPost, 'content'>[] =>
+  posts.map((post) => {
+    const { content: _ignored, ...rest } = post;
+    return rest;
+  });
+
+const restorePostsFromListCache = (posts: Omit<BlogPost, 'content'>[]): BlogPost[] =>
+  posts.map((post) => ({ ...post, content: '' }));
+
+const indexPostsInSlugCache = (posts: BlogPost[]): void => {
+  posts.forEach((post) => {
+    postsBySlugCache.set(post.slug, post);
+  });
+};
+
+const hydratePublishedPostsFromSession = (): void => {
+  if (postsCache.has('published') || typeof sessionStorage === 'undefined') {
+    return;
+  }
+
+  try {
+    const raw = sessionStorage.getItem(SESSION_PUBLISHED_POSTS_KEY);
+    if (!raw) {
+      return;
+    }
+
+    const parsed = JSON.parse(raw) as Omit<BlogPost, 'content'>[];
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      return;
+    }
+
+    const posts = restorePostsFromListCache(parsed);
+    postsCache.set('published', posts);
+    indexPostsInSlugCache(posts);
+  } catch {
+    sessionStorage.removeItem(SESSION_PUBLISHED_POSTS_KEY);
+  }
+};
+
+const persistPublishedPostsToSession = (posts: BlogPost[]): void => {
+  if (typeof sessionStorage === 'undefined') {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(
+      SESSION_PUBLISHED_POSTS_KEY,
+      JSON.stringify(stripContentForListCache(posts)),
+    );
+  } catch {
+    // Ignore quota errors — in-memory cache still works for this session.
+  }
+};
+
+hydratePublishedPostsFromSession();
 
 export function getCachedPosts(options?: { includeDrafts?: boolean }): BlogPost[] | undefined {
   return postsCache.get(cacheKey(options));
 }
 
+export function getCachedPostBySlug(slug: string): BlogPost | undefined {
+  const cached = postsBySlugCache.get(slug);
+  if (cached) {
+    return cached;
+  }
+
+  for (const key of ['published', 'all'] as PostsCacheKey[]) {
+    const posts = postsCache.get(key);
+    const found = posts?.find((post) => post.slug === slug);
+    if (found) {
+      postsBySlugCache.set(slug, found);
+      return found;
+    }
+  }
+
+  return undefined;
+}
+
 export function invalidatePostsCache(): void {
   postsCache.clear();
   postsInflight.clear();
+  postsBySlugCache.clear();
+  postBySlugInflight.clear();
+  sessionStorage.removeItem(SESSION_PUBLISHED_POSTS_KEY);
 }
 
-export async function getPosts(options?: { includeDrafts?: boolean }): Promise<BlogPost[]> {
+const fetchAndCachePosts = async (key: PostsCacheKey, options?: { includeDrafts?: boolean }): Promise<BlogPost[]> => {
+  const { data, error } = await fetchPosts(options);
+  const posts = error || !data ? [] : data.map(mapDbPostToBlogPost);
+  postsCache.set(key, posts);
+  indexPostsInSlugCache(posts);
+
+  if (key === 'published') {
+    persistPublishedPostsToSession(posts);
+  }
+
+  return posts;
+};
+
+export async function getPosts(options?: { includeDrafts?: boolean; revalidate?: boolean }): Promise<BlogPost[]> {
   const key = cacheKey(options);
   const cached = postsCache.get(key);
-  if (cached) {
+
+  if (cached && !options?.revalidate) {
     return cached;
   }
 
@@ -40,28 +135,53 @@ export async function getPosts(options?: { includeDrafts?: boolean }): Promise<B
     return inflight;
   }
 
-  const request = fetchPosts(options)
-    .then(({ data, error }) => {
-      const posts = error || !data ? [] : data.map(mapDbPostToBlogPost);
-      postsCache.set(key, posts);
+  const request = fetchAndCachePosts(key, options)
+    .finally(() => {
       postsInflight.delete(key);
-      return posts;
-    })
-    .catch((err) => {
-      postsInflight.delete(key);
-      throw err;
     });
 
   postsInflight.set(key, request);
   return request;
 }
 
-export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
-  const { data, error } = await fetchPostBySlug(slug);
-  if (error || !data) {
-    return undefined;
+export function prefetchPublishedPosts(): Promise<BlogPost[]> {
+  const cached = postsCache.get('published');
+  if (cached?.length) {
+    void getPosts({ revalidate: true });
+    return Promise.resolve(cached);
   }
-  return mapDbPostToBlogPost(data);
+
+  return getPosts();
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  const cached = getCachedPostBySlug(slug);
+  if (cached) {
+    return cached;
+  }
+
+  const inflight = postBySlugInflight.get(slug);
+  if (inflight) {
+    return inflight;
+  }
+
+  const request = fetchPostBySlug(slug)
+    .then(({ data, error }) => {
+      postBySlugInflight.delete(slug);
+      if (error || !data) {
+        return undefined;
+      }
+      const post = mapDbPostToBlogPost(data);
+      postsBySlugCache.set(slug, post);
+      return post;
+    })
+    .catch((err) => {
+      postBySlugInflight.delete(slug);
+      throw err;
+    });
+
+  postBySlugInflight.set(slug, request);
+  return request;
 }
 
 export async function getPostById(id: string): Promise<BlogPost | undefined> {

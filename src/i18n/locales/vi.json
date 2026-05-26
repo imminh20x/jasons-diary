@@ -31,7 +31,8 @@
     "featured": "Nổi bật",
     "latest": "Mới nhất",
     "moreArticles": "Thêm bài viết",
-    "readArticle": "Đọc bài"
+    "readArticle": "Đọc bài",
+    "loadingPosts": "Đang tải bài viết"
   },
   "post": {
     "notFoundTitle": "Không tìm thấy bài viết",
