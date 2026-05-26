@@ -53,7 +53,9 @@
 .footer-logo span {
   background: var(--color-brand-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: var(--palette-sky);
   display: inline-block;
 }
 

@@ -11,7 +11,9 @@
   position: relative;
   overflow: hidden;
   margin-bottom: 2rem;
-  background-color: var(--color-bg-offset);
+  margin-top: -4.5rem;
+  padding-top: calc(3.5rem + 4.5rem);
+  background: var(--color-band-surface);
 }
 
 .home-hero-inner {
@@ -25,10 +27,11 @@
 
 .home-title {
   font-size: var(--type-home-title);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.15;
   margin-bottom: 0.75rem;
+  color: var(--color-text-highlight);
 }
 
 .home-subtitle {
@@ -69,8 +72,9 @@
 }
 
 .category-pill:not(.active):hover {
-  background-color: var(--color-bg-muted);
-  border-color: var(--color-text-muted);
+  background-color: var(--color-accent-subtle);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* Centered Pill-Shaped Search Wrapper */
@@ -176,7 +180,6 @@
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
 }
-
 /* 1. Featured Post Styles */
 .featured-section {
   margin-bottom: 3.5rem;
@@ -224,7 +227,7 @@
 .featured-content .text-eyebrow {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-accent);
   letter-spacing: 0.06em;
   margin-bottom: 0.75rem;
 }

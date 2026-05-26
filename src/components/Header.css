@@ -12,7 +12,7 @@
 
 .header-logo {
   font-size: 1.625rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--color-text-highlight);
   display: inline-flex;
@@ -71,7 +71,7 @@
 
 .header-links .lang-switch-btn.active {
   background: var(--color-brand-gradient);
-  color: #fff;
+  color: var(--color-on-accent);
 }
 
 .header-links .lang-switch-btn:hover:not(.active) {
@@ -215,7 +215,7 @@
 
 .header-mobile-actions .lang-switch-btn.active {
   background: var(--color-brand-gradient);
-  color: #fff;
+  color: var(--color-on-accent);
 }
 
 .header-mobile-actions .lang-switch-btn:hover:not(.active) {

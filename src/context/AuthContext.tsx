@@ -1,12 +1,14 @@
 /* eslint-disable */
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import { getSupabase } from '../supabaseClient';
+import { isAdminAuthenticated } from '../utils/adminAuth';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isLoggedIn: boolean;
   login: (email: string, password: string) => Promise<{
     data: { user: User | null; session: Session | null };
     error: any;
@@ -83,8 +85,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const isLoggedIn = useMemo(() => isAdminAuthenticated(user), [user]);
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, session, loading, isLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

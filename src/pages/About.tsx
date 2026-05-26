@@ -99,19 +99,19 @@ export const About: React.FC = () => {
               <a href={contactEmailHref()} className="btn btn-primary" data-testid="btn-contact-email">
                 <Mail size={16} /> {t('about.contactMe')}
               </a>
-              )}
-              {SITE_CONTACT.facebook && (
+              )}  
+              {SITE_CONTACT.linkedin && (
               <a
-                href={SITE_CONTACT.facebook}
+                href={SITE_CONTACT.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
-                data-testid="link-facebook"
+                data-testid="link-linkedin"
               >
-                <FacebookIcon /> Facebook <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
+                <LinkedinIcon /> LinkedIn <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
               </a>
               )}
-              {SITE_CONTACT.github && (
+                {SITE_CONTACT.github && (
               <a
                 href={SITE_CONTACT.github}
                 target="_blank"
@@ -122,15 +122,15 @@ export const About: React.FC = () => {
                 <GithubIcon /> GitHub <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
               </a>
               )}
-              {SITE_CONTACT.linkedin && (
+                {SITE_CONTACT.facebook && (
               <a
-                href={SITE_CONTACT.linkedin}
+                href={SITE_CONTACT.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
-                data-testid="link-linkedin"
+                data-testid="link-facebook"
               >
-                <LinkedinIcon /> LinkedIn <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
+                <FacebookIcon /> Facebook <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
               </a>
               )}
             </div>

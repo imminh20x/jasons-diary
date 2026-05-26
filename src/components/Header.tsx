@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sun, Moon, ShieldAlert, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { isAdminAuthenticated } from '../utils/adminAuth';
+import { useIsLoggedIn } from '../hooks/useIsLoggedIn';
 import { SiteLogo } from './SiteLogo';
 import './Header.css';
 
@@ -47,7 +47,8 @@ const LangSwitch: React.FC<{ className?: string; showLabel?: boolean }> = ({
 
 export const Header: React.FC = () => {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const isLoggedIn = useIsLoggedIn();
   const location = useLocation();
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
@@ -59,23 +60,8 @@ export const Header: React.FC = () => {
     return 'light';
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(() => isAdminAuthenticated(user));
-
   const [isVisible, setIsVisible] = useState(true);
   const [isElevated, setIsElevated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = () => {
-      setIsLoggedIn(isAdminAuthenticated(user));
-    };
-
-    window.addEventListener('storage', checkAuth);
-    checkAuth();
-
-    return () => {
-      window.removeEventListener('storage', checkAuth);
-    };
-  }, [user]);
 
   useEffect(() => {
     if (theme === 'light') {
@@ -127,7 +113,6 @@ export const Header: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
-    setIsLoggedIn(false);
     window.location.href = '/';
   };
 

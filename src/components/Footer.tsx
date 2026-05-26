@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Mail } from 'lucide-react';
 import { SITE_CONTACT, contactEmailHref, contactPhoneHref, hasContactEmail, hasContactPhone } from '../constants/siteContact';
+import { useIsLoggedIn } from '../hooks/useIsLoggedIn';
 import { SiteLogo } from './SiteLogo';
 import './Footer.css';
 
@@ -75,6 +76,7 @@ const PhoneIcon = () => (
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
+  const isLoggedIn = useIsLoggedIn();
 
   return (
     <footer className="footer" data-testid="footer-container">
@@ -110,24 +112,17 @@ export const Footer: React.FC = () => {
             <li>
               <Link to="/about" data-testid="footer-link-about">{t('footer.aboutMe')}</Link>
             </li>
+            {isLoggedIn && (
+              <li>
+                <Link to="/admin" data-testid="footer-link-admin">{t('footer.admin')}</Link>
+              </li>
+            )}
           </ul>
         </div>
 
         <div className="footer-social-col">
           <h4 className="footer-title">{t('footer.connect')}</h4>
           <div className="footer-social-links">
-            {SITE_CONTACT.github && (
-            <a
-              href={SITE_CONTACT.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-social-btn"
-              title="GitHub"
-              data-testid="footer-social-github"
-            >
-              <GithubIcon />
-            </a>
-            )}
             {SITE_CONTACT.linkedin && (
             <a
               href={SITE_CONTACT.linkedin}
@@ -138,6 +133,18 @@ export const Footer: React.FC = () => {
               data-testid="footer-social-linkedin"
             >
               <LinkedinIcon />
+            </a>
+            )}
+            {SITE_CONTACT.github && (
+            <a
+              href={SITE_CONTACT.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-social-btn"
+              title="GitHub"
+              data-testid="footer-social-github"
+            >
+              <GithubIcon />
             </a>
             )}
             {SITE_CONTACT.facebook && (

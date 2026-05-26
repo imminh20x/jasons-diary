@@ -9,7 +9,9 @@
 .about-hero-section {
   padding: 3rem 0 2.5rem;
   margin-bottom: 2.5rem;
-  background-color: var(--color-bg-offset);
+  margin-top: -4.5rem;
+  padding-top: calc(3rem + 4.5rem);
+  background: var(--color-band-surface);
 }
 
 .about-hero-container {

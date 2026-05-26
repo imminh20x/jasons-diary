@@ -17,6 +17,7 @@
     "navigation": "Điều hướng",
     "home": "Trang chủ",
     "aboutMe": "Giới thiệu",
+    "admin": "Bảng điều khiển",
     "connect": "Kết nối",
     "copyright": "© {{year}} Đỗ Cao Minh. Bảo lưu mọi quyền. Xây dựng bằng React & thẩm mỹ tinh gọn."
   },
