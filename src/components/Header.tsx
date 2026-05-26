@@ -177,8 +177,7 @@ export const Header: React.FC = () => {
               </Link>
               <button
                 onClick={handleLogout}
-                className="btn btn-secondary"
-                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                className="btn btn-secondary header-logout-btn"
                 title={t('header.logout')}
               >
                 <LogOut size={14} />

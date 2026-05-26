@@ -1,4 +1,4 @@
-import React, { isValidElement, memo, useMemo, useEffect, useState, useCallback } from 'react';
+import React, { isValidElement, memo, useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
@@ -46,6 +46,30 @@ const PostMarkdown = memo(function PostMarkdown({ content }: { content: string }
   );
 });
 
+const scrollTocItemIntoView = (container: HTMLElement, item: HTMLElement): void => {
+  const padding = 12;
+  const containerRect = container.getBoundingClientRect();
+  const itemRect = item.getBoundingClientRect();
+
+  const isFullyVisible =
+    itemRect.top >= containerRect.top + padding &&
+    itemRect.bottom <= containerRect.bottom - padding;
+
+  if (isFullyVisible) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior: ScrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+
+  if (itemRect.top < containerRect.top + padding) {
+    container.scrollBy({ top: itemRect.top - containerRect.top - padding, behavior });
+    return;
+  }
+
+  container.scrollBy({ top: itemRect.bottom - containerRect.bottom + padding, behavior });
+};
+
 const TableOfContents = memo(function TableOfContents({
   headings,
   activeId,
@@ -57,6 +81,21 @@ const TableOfContents = memo(function TableOfContents({
   title: string;
   onSelect: (id: string) => void;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!activeId || !scrollRef.current) {
+      return;
+    }
+
+    const activeItem = scrollRef.current.querySelector<HTMLElement>(`[data-toc-id="${activeId}"]`);
+    if (!activeItem) {
+      return;
+    }
+
+    scrollTocItemIntoView(scrollRef.current, activeItem);
+  }, [activeId, headings]);
+
   if (headings.length === 0) {
     return null;
   }
@@ -64,13 +103,15 @@ const TableOfContents = memo(function TableOfContents({
   return (
     <div className="toc-card">
       <h3 className="toc-title">{title}</h3>
-      <div className="toc-scroll">
+      <div className="toc-scroll" ref={scrollRef}>
         <ul className="toc-list">
           {headings.map((heading) => (
             <li
               key={heading.id}
+              data-toc-id={heading.id}
               onClick={() => onSelect(heading.id)}
               className={`toc-item toc-item-h${heading.level} ${activeId === heading.id ? 'active' : ''}`}
+              aria-current={activeId === heading.id ? 'location' : undefined}
             >
               {heading.text}
             </li>
@@ -166,27 +207,34 @@ export const BlogPost: React.FC = () => {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-80px 0px -60% 0px', threshold: 0.1 },
-    );
+    const scrollOffset = 100;
 
-    headings.forEach((heading) => {
-      const el = document.getElementById(heading.id);
-      if (el) observer.observe(el);
-    });
+    const updateActiveHeading = () => {
+      let currentId = headings[0]?.id ?? '';
+
+      for (const heading of headings) {
+        const el = document.getElementById(heading.id);
+        if (!el) {
+          continue;
+        }
+
+        if (el.getBoundingClientRect().top <= scrollOffset) {
+          currentId = heading.id;
+        } else {
+          break;
+        }
+      }
+
+      setActiveId((previous) => (previous === currentId ? previous : currentId));
+    };
+
+    updateActiveHeading();
+    window.addEventListener('scroll', updateActiveHeading, { passive: true });
+    window.addEventListener('resize', updateActiveHeading);
 
     return () => {
-      headings.forEach((heading) => {
-        const el = document.getElementById(heading.id);
-        if (el) observer.unobserve(el);
-      });
+      window.removeEventListener('scroll', updateActiveHeading);
+      window.removeEventListener('resize', updateActiveHeading);
     };
   }, [headings]);
 

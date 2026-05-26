@@ -286,6 +286,7 @@
   color: var(--color-text-highlight);
   font-weight: 600;
   border-left-color: var(--color-text-highlight);
+  background-color: var(--color-accent-subtle);
 }
 
 .toc-item-h3.active {
