@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sun, Moon, ShieldAlert, LogOut, Menu, X } from 'lucide-react';
+import { Sun, Moon, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useIsLoggedIn } from '../hooks/useIsLoggedIn';
 import { SiteLogo } from './SiteLogo';
@@ -220,7 +220,7 @@ export const Header: React.FC = () => {
             aria-label={t('header.closeMenu')}
             data-testid="btn-sidebar-close"
           >
-            <X size={22} />
+            <X size={18} />
           </button>
         </div>
 
@@ -243,7 +243,7 @@ export const Header: React.FC = () => {
             {t('header.about')}
           </Link>
 
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <>
               <Link
                 to="/admin"
@@ -264,16 +264,6 @@ export const Header: React.FC = () => {
                 {t('header.logout')}
               </button>
             </>
-          ) : (
-            <Link
-              to="/admin"
-              className={`sidebar-link ${location.pathname === '/admin' ? 'active' : ''}`}
-              onClick={() => setIsSidebarOpen(false)}
-              data-testid="sidebar-link-admin"
-            >
-              <ShieldAlert size={16} style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
-              {t('header.adminLogin')}
-            </Link>
           )}
         </nav>
       </div>

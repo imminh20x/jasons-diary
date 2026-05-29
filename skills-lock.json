@@ -1,17 +1,11 @@
 {
   "version": 1,
   "skills": {
-    "playwright-core": {
+    "playwright-skill": {
       "source": "testdino-hq/playwright-skill",
       "sourceType": "github",
-      "skillPath": "core/SKILL.md",
-      "computedHash": "96c32439c12b8754edaf6210e31b207c253325e3b21378bb49868926aa19d061"
-    },
-    "playwright-pom": {
-      "source": "testdino-hq/playwright-skill",
-      "sourceType": "github",
-      "skillPath": "pom/SKILL.md",
-      "computedHash": "b7bf9f8cec29b3878cf503c6dbf19cafe181ac4eb0c63e94168d16942345707f"
+      "skillPath": "SKILL.md",
+      "computedHash": "96f555933416cd7f3bad397810523b79a7020ff3e338eb115027f2230e5c4d4c"
     },
     "supabase": {
       "source": "supabase/agent-skills",
