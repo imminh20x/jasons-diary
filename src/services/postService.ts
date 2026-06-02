@@ -85,14 +85,14 @@ export function getCachedPosts(options?: { includeDrafts?: boolean }): BlogPost[
 
 export function getCachedPostBySlug(slug: string): BlogPost | undefined {
   const cached = postsBySlugCache.get(slug);
-  if (cached) {
+  if (cached && cached.content !== '') {
     return cached;
   }
 
   for (const key of ['published', 'all'] as PostsCacheKey[]) {
     const posts = postsCache.get(key);
     const found = posts?.find((post) => post.slug === slug);
-    if (found) {
+    if (found && found.content !== '') {
       postsBySlugCache.set(slug, found);
       return found;
     }

@@ -12,6 +12,7 @@ import { isAdminAuthenticated } from '../utils/adminAuth';
 import { resolvePostCoverImage } from '../utils/generateCoverImage';
 import { registerPostTags } from '../utils/postTags';
 import { uploadImage } from '../services/db';
+import { compressImage } from '../utils/imageUrl';
 import { PostTagsInput } from '../components/PostTagsInput';
 import './AdminEditor.css';
 
@@ -151,7 +152,11 @@ export const AdminEditor: React.FC = () => {
     }
 
     try {
-      const { data, error } = await uploadImage(file);
+      const maxWidth = target === 'cover' ? 1200 : 1000;
+      const maxHeight = target === 'cover' ? 1200 : 1000;
+      const optimizedFile = await compressImage(file, maxWidth, maxHeight, 0.85);
+
+      const { data, error } = await uploadImage(optimizedFile);
 
       if (error || !data?.url) {
         setUploadError(error?.message ?? t('editor.uploadFailed'));
@@ -201,7 +206,8 @@ export const AdminEditor: React.FC = () => {
 
     try {
       for (const file of files) {
-        const { data, error } = await uploadImage(file);
+        const optimizedFile = await compressImage(file, 1000, 1000, 0.85);
+        const { data, error } = await uploadImage(optimizedFile);
 
         if (error || !data?.url) {
           setUploadError(error?.message ?? t('editor.uploadFailed'));
