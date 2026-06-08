@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 import { ArrowLeft, Save, Eye, Edit, HelpCircle, ChevronDown, ImagePlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getPostById, savePost } from '../services/postService';
@@ -564,7 +566,7 @@ export const AdminEditor: React.FC = () => {
               {summary && <p className="preview-summary">{summary}</p>}
 
               <div className="markdown-body">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>{content}</ReactMarkdown>
               </div>
             </article>
           )}

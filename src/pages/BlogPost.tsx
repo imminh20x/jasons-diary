@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 import { ArrowLeft } from 'lucide-react';
 import { getCachedPostBySlug, getPostBySlug } from '../services/postService';
 import type { BlogPost as BlogPostData } from '../types/post';
@@ -40,7 +42,7 @@ const markdownComponents = {
 
 const PostMarkdown = memo(function PostMarkdown({ content }: { content: string }) {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]} components={markdownComponents}>
       {content}
     </ReactMarkdown>
   );

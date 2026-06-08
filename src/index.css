@@ -615,7 +615,8 @@ button, .btn {
 }
 
 .markdown-body pre {
-  background-color: var(--color-bg-muted);
+  background-color: #0d1117;
+  color: #c9d1d9;
   padding: 1rem;
   border-radius: var(--radius-md);
   overflow-x: auto;
