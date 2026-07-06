@@ -8,7 +8,7 @@ interface AboutEditModalProps {
   onClose: () => void;
   currentLang: string;
   initialData: any;
-  onSave: (updatedData: any) => Promise<void>;
+  onSave: (updatedData: any, syncLang: boolean) => Promise<void>;
 }
 
 export const AboutEditModal: React.FC<AboutEditModalProps> = ({
@@ -21,6 +21,7 @@ export const AboutEditModal: React.FC<AboutEditModalProps> = ({
   const [activeTab, setActiveTab] = useState<'basics' | 'skills' | 'jobs' | 'certs'>('basics');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncLang, setSyncLang] = useState(false);
 
   // Form states
   const [eyebrow, setEyebrow] = useState('');
@@ -54,7 +55,11 @@ export const AboutEditModal: React.FC<AboutEditModalProps> = ({
       setName(initialData.name || '');
       setTitle(initialData.title || '');
       setBio(initialData.bio || '');
-      setAvatarUrl(initialData.avatar_url || '');
+      const isRemoteUrl =
+        initialData.avatar_url &&
+        typeof initialData.avatar_url === 'string' &&
+        (initialData.avatar_url.startsWith('http://') || initialData.avatar_url.startsWith('https://'));
+      setAvatarUrl(isRemoteUrl ? initialData.avatar_url : '');
 
       setSkills({
         ai: {
@@ -141,7 +146,7 @@ export const AboutEditModal: React.FC<AboutEditModalProps> = ({
     };
 
     try {
-      await onSave(payload);
+      await onSave(payload, syncLang);
       onClose();
     } catch (err: any) {
       setError(err.message || 'Failed to save changes. Please check permissions and database status.');
@@ -832,27 +837,40 @@ export const AboutEditModal: React.FC<AboutEditModalProps> = ({
         </div>
 
         {/* Footer actions */}
-        <div className="about-edit-footer">
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-secondary"
-            disabled={loading}
-            data-testid="btn-cancel-edit-about"
-          >
-            {currentLang === 'vi' ? 'Hủy bỏ' : 'Cancel'}
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            className="btn btn-primary"
-            disabled={loading}
-            data-testid="btn-save-edit-about"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-          >
-            <Save size={14} />
-            {loading ? (currentLang === 'vi' ? 'Đang lưu...' : 'Saving...') : (currentLang === 'vi' ? 'Lưu thay đổi' : 'Save Changes')}
-          </button>
+        <div className="about-edit-footer" style={{ justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: 'var(--type-body-sm)', color: 'var(--color-text)' }}>
+            <input
+              type="checkbox"
+              checked={syncLang}
+              onChange={(e) => setSyncLang(e.target.checked)}
+              style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+              data-testid="checkbox-sync-lang"
+            />
+            {currentLang === 'vi' ? 'Đồng bộ sang bản tiếng Anh (EN)' : 'Sync to Vietnamese (VI) version'}
+          </label>
+          
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              disabled={loading}
+              data-testid="btn-cancel-edit-about"
+            >
+              {currentLang === 'vi' ? 'Hủy bỏ' : 'Cancel'}
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              className="btn btn-primary"
+              disabled={loading}
+              data-testid="btn-save-edit-about"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              <Save size={14} />
+              {loading ? (currentLang === 'vi' ? 'Đang lưu...' : 'Saving...') : (currentLang === 'vi' ? 'Lưu thay đổi' : 'Save Changes')}
+            </button>
+          </div>
         </div>
 
       </div>

@@ -148,13 +148,21 @@ export const About: React.FC = () => {
   // Merge the database profile values (if any) with the default local translations
   const data = useMemo(() => {
     if (!profile) return defaultProfile;
+
+    const getAvatarUrl = (url: any) => {
+      if (typeof url === 'string' && url.startsWith('https://')) {
+        return url;
+      }
+      return defaultProfile.avatar_url;
+    };
+
     return {
       eyebrow: profile.eyebrow || defaultProfile.eyebrow,
       name: profile.name || defaultProfile.name,
       title: profile.title || defaultProfile.title,
       bio: profile.bio || defaultProfile.bio,
       avatarAlt: profile.name ? `${profile.name} - Jason` : defaultProfile.avatarAlt,
-      avatar_url: profile.avatar_url || defaultProfile.avatar_url,
+      avatar_url: getAvatarUrl(profile.avatar_url),
       skills: {
         ai: {
           title: profile.skills?.ai?.title || defaultProfile.skills.ai.title,
@@ -196,10 +204,21 @@ export const About: React.FC = () => {
     };
   }, [profile, defaultProfile]);
 
-  const handleSave = async (updatedData: any) => {
-    const saved = await saveAboutProfile(updatedData);
-    if (saved) {
-      setProfile(saved);
+  const handleSave = async (updatedData: any, syncLang: boolean) => {
+    if (syncLang) {
+      const otherLang = updatedData.lang === 'vi' ? 'en' : 'vi';
+      const [savedCurrent] = await Promise.all([
+        saveAboutProfile(updatedData),
+        saveAboutProfile({ ...updatedData, lang: otherLang }),
+      ]);
+      if (savedCurrent) {
+        setProfile(savedCurrent);
+      }
+    } else {
+      const saved = await saveAboutProfile(updatedData);
+      if (saved) {
+        setProfile(saved);
+      }
     }
   };
 
@@ -236,42 +255,42 @@ export const About: React.FC = () => {
 
             <div className="about-actions-row">
               {hasContactEmail() && (
-              <a href={contactEmailHref()} className="btn btn-primary" data-testid="btn-contact-email">
-                <Mail size={16} /> {t('about.contactMe')}
-              </a>
-              )}  
+                <a href={contactEmailHref()} className="btn btn-primary" data-testid="btn-contact-email">
+                  <Mail size={16} /> {t('about.contactMe')}
+                </a>
+              )}
               {SITE_CONTACT.linkedin && (
-              <a
-                href={SITE_CONTACT.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                data-testid="link-linkedin"
-              >
-                <LinkedinIcon /> LinkedIn <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
-              </a>
+                <a
+                  href={SITE_CONTACT.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  data-testid="link-linkedin"
+                >
+                  <LinkedinIcon /> LinkedIn <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
+                </a>
               )}
-                {SITE_CONTACT.github && (
-              <a
-                href={SITE_CONTACT.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                data-testid="link-github"
-              >
-                <GithubIcon /> GitHub <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
-              </a>
+              {SITE_CONTACT.github && (
+                <a
+                  href={SITE_CONTACT.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  data-testid="link-github"
+                >
+                  <GithubIcon /> GitHub <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
+                </a>
               )}
-                {SITE_CONTACT.facebook && (
-              <a
-                href={SITE_CONTACT.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                data-testid="link-facebook"
-              >
-                <FacebookIcon /> Facebook <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
-              </a>
+              {SITE_CONTACT.facebook && (
+                <a
+                  href={SITE_CONTACT.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  data-testid="link-facebook"
+                >
+                  <FacebookIcon /> Facebook <ArrowUpRight size={14} style={{ opacity: 0.6 }} />
+                </a>
               )}
             </div>
           </div>
