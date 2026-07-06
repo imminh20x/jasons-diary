@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Mail, Briefcase, Award, GraduationCap, ArrowUpRight } from 'lucide-react';
+import { Mail, Briefcase, Award, GraduationCap, ArrowUpRight, Edit2 } from 'lucide-react';
 import { SITE_AUTHOR } from '../constants/siteAuthor';
 import { SITE_CONTACT, contactEmailHref, hasContactEmail } from '../constants/siteContact';
+import { fetchAboutProfile, saveAboutProfile } from '../services/aboutService';
+import { AboutEditModal } from '../features/about-editor/AboutEditModal';
+import { useIsLoggedIn } from '../hooks/useIsLoggedIn';
 import './About.css';
 
 const GithubIcon = () => (
@@ -72,8 +75,133 @@ type AboutJobGroup = {
 };
 
 export const About: React.FC = () => {
-  const { t } = useTranslation();
-  const jobGroups = t('about.jobs.groups', { returnObjects: true }) as AboutJobGroup[];
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language.startsWith('vi') ? 'vi' : 'en';
+  const isLoggedIn = useIsLoggedIn();
+
+  const [profile, setProfile] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Fetch the about profile when the language changes
+  useEffect(() => {
+    let active = true;
+    void fetchAboutProfile(currentLang).then((data) => {
+      if (active) {
+        setProfile(data);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [currentLang]);
+
+  // Compute default values from the translation JSON files
+  const defaultProfile = useMemo(() => {
+    return {
+      eyebrow: t('about.eyebrow'),
+      name: t('about.name'),
+      title: t('about.title'),
+      bio: t('about.bio'),
+      avatarAlt: t('about.avatarAlt'),
+      avatar_url: SITE_AUTHOR.avatar,
+      skills: {
+        ai: {
+          title: t('about.skills.ai.title'),
+          desc: t('about.skills.ai.desc'),
+        },
+        qa: {
+          title: t('about.skills.qa.title'),
+          desc: t('about.skills.qa.desc'),
+        },
+        sql: {
+          title: t('about.skills.sql.title'),
+          desc: t('about.skills.sql.desc'),
+        },
+      },
+      jobs: {
+        groups: t('about.jobs.groups', { returnObjects: true }) as AboutJobGroup[],
+      },
+      certs: {
+        education: {
+          date: t('about.certs.education.date'),
+          role: t('about.certs.education.role'),
+          company: t('about.certs.education.company'),
+          desc: t('about.certs.education.desc'),
+        },
+        toeic: {
+          role: t('about.certs.toeic.role'),
+          company: t('about.certs.toeic.company'),
+        },
+        efset: {
+          role: t('about.certs.efset.role'),
+          company: t('about.certs.efset.company'),
+        },
+        aws: {
+          role: t('about.certs.aws.role'),
+          company: t('about.certs.aws.company'),
+          desc: t('about.certs.aws.desc'),
+        },
+      },
+    };
+  }, [t]);
+
+  // Merge the database profile values (if any) with the default local translations
+  const data = useMemo(() => {
+    if (!profile) return defaultProfile;
+    return {
+      eyebrow: profile.eyebrow || defaultProfile.eyebrow,
+      name: profile.name || defaultProfile.name,
+      title: profile.title || defaultProfile.title,
+      bio: profile.bio || defaultProfile.bio,
+      avatarAlt: profile.name ? `${profile.name} - Jason` : defaultProfile.avatarAlt,
+      avatar_url: profile.avatar_url || defaultProfile.avatar_url,
+      skills: {
+        ai: {
+          title: profile.skills?.ai?.title || defaultProfile.skills.ai.title,
+          desc: profile.skills?.ai?.desc || defaultProfile.skills.ai.desc,
+        },
+        qa: {
+          title: profile.skills?.qa?.title || defaultProfile.skills.qa.title,
+          desc: profile.skills?.qa?.desc || defaultProfile.skills.qa.desc,
+        },
+        sql: {
+          title: profile.skills?.sql?.title || defaultProfile.skills.sql.title,
+          desc: profile.skills?.sql?.desc || defaultProfile.skills.sql.desc,
+        },
+      },
+      jobs: {
+        groups: profile.jobs?.groups || defaultProfile.jobs.groups,
+      },
+      certs: {
+        education: {
+          date: profile.certs?.education?.date || defaultProfile.certs.education.date,
+          role: profile.certs?.education?.role || defaultProfile.certs.education.role,
+          company: profile.certs?.education?.company || defaultProfile.certs.education.company,
+          desc: profile.certs?.education?.desc || defaultProfile.certs.education.desc,
+        },
+        toeic: {
+          role: profile.certs?.toeic?.role || defaultProfile.certs.toeic.role,
+          company: profile.certs?.toeic?.company || defaultProfile.certs.toeic.company,
+        },
+        efset: {
+          role: profile.certs?.efset?.role || defaultProfile.certs.efset.role,
+          company: profile.certs?.efset?.company || defaultProfile.certs.efset.company,
+        },
+        aws: {
+          role: profile.certs?.aws?.role || defaultProfile.certs.aws.role,
+          company: profile.certs?.aws?.company || defaultProfile.certs.aws.company,
+          desc: profile.certs?.aws?.desc || defaultProfile.certs.aws.desc,
+        },
+      },
+    };
+  }, [profile, defaultProfile]);
+
+  const handleSave = async (updatedData: any) => {
+    const saved = await saveAboutProfile(updatedData);
+    if (saved) {
+      setProfile(saved);
+    }
+  };
 
   return (
     <div className="about-page fade-in">
@@ -83,16 +211,28 @@ export const About: React.FC = () => {
         <div className="container about-hero-container">
           <div className="about-profile-wrapper">
             <img
-              src={SITE_AUTHOR.avatar}
-              alt={t('about.avatarAlt')}
+              src={data.avatar_url}
+              alt={data.avatarAlt}
               className="about-avatar-img"
             />
           </div>
           <div className="about-hero-text">
-            <span className="about-eyebrow about-availability-badge">{t('about.eyebrow')}</span>
-            <h1 className="about-name" data-testid="about-name">{t('about.name')}</h1>
-            <p className="about-title">{t('about.title')}</p>
-            <p className="about-bio">{t('about.bio')}</p>
+            <span className="about-eyebrow about-availability-badge">{data.eyebrow}</span>
+            <h1 className="about-name" data-testid="about-name">
+              {data.name}
+              {isLoggedIn && (
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="about-inline-edit-btn"
+                  title={currentLang === 'vi' ? 'Chỉnh sơ thông tin' : 'Edit Information'}
+                  data-testid="btn-edit-about-page"
+                >
+                  <Edit2 size={18} />
+                </button>
+              )}
+            </h1>
+            <p className="about-title">{data.title}</p>
+            <p className="about-bio">{data.bio}</p>
 
             <div className="about-actions-row">
               {hasContactEmail() && (
@@ -147,8 +287,8 @@ export const About: React.FC = () => {
 
           <div className="skills-grid">
             <div className="skills-card">
-              <h3 className="skills-category-title">{t('about.skills.ai.title')}</h3>
-              <p className="skills-category-desc">{t('about.skills.ai.desc')}</p>
+              <h3 className="skills-category-title">{data.skills.ai.title}</h3>
+              <p className="skills-category-desc">{data.skills.ai.desc}</p>
               <div className="skills-tags">
                 <span>Gen AI</span>
                 <span>AI rules and skills</span>
@@ -159,8 +299,8 @@ export const About: React.FC = () => {
             </div>
 
             <div className="skills-card">
-              <h3 className="skills-category-title">{t('about.skills.qa.title')}</h3>
-              <p className="skills-category-desc">{t('about.skills.qa.desc')}</p>
+              <h3 className="skills-category-title">{data.skills.qa.title}</h3>
+              <p className="skills-category-desc">{data.skills.qa.desc}</p>
               <div className="skills-tags">
                 <span>JS/TS</span>
                 <span>Playwright E2E</span>
@@ -173,8 +313,8 @@ export const About: React.FC = () => {
             </div>
 
             <div className="skills-card">
-              <h3 className="skills-category-title">{t('about.skills.sql.title')}</h3>
-              <p className="skills-category-desc">{t('about.skills.sql.desc')}</p>
+              <h3 className="skills-category-title">{data.skills.sql.title}</h3>
+              <p className="skills-category-desc">{data.skills.sql.desc}</p>
               <div className="skills-tags">
                 <span>PostgreSQL</span>
                 <span>DBeaver</span>
@@ -195,7 +335,7 @@ export const About: React.FC = () => {
             </div>
 
             <div className="timeline">
-              {jobGroups.map((group) => (
+              {data.jobs.groups.map((group: any) => (
                 <div key={group.company} className="timeline-item">
                   <div className="timeline-badge">
                     <Briefcase size={16} />
@@ -203,7 +343,7 @@ export const About: React.FC = () => {
                   <div className="timeline-content">
                     <h3 className="timeline-company">{group.company}</h3>
                     <ul className="timeline-positions">
-                      {group.positions.map((position) => (
+                      {group.positions.map((position: any) => (
                         <li
                           key={`${position.role}-${position.date}`}
                           className="timeline-position"
@@ -214,7 +354,7 @@ export const About: React.FC = () => {
                             {position.teamSize ? ` - ${position.teamSize}` : null}
                           </h4>
                           <ul className="timeline-desc-list">
-                            {position.bullets.map((item) => (
+                            {position.bullets.map((item: string) => (
                               <li key={item}>{item}</li>
                             ))}
                           </ul>
@@ -239,10 +379,10 @@ export const About: React.FC = () => {
                   <GraduationCap size={16} />
                 </div>
                 <div className="timeline-content">
-                  <span className="timeline-date">{t('about.certs.education.date')}</span>
-                  <h3 className="timeline-company">{t('about.certs.education.company')}</h3>
-                  <h4 className="timeline-role">{t('about.certs.education.role')}</h4>
-                  <p className="timeline-desc">{t('about.certs.education.desc')}</p>
+                  <span className="timeline-date">{data.certs.education.date}</span>
+                  <h3 className="timeline-company">{data.certs.education.company}</h3>
+                  <h4 className="timeline-role">{data.certs.education.role}</h4>
+                  <p className="timeline-desc">{data.certs.education.desc}</p>
                 </div>
               </div>
 
@@ -252,8 +392,8 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">2024</span>
-                  <h3 className="timeline-company">{t('about.certs.toeic.company')}</h3>
-                  <h4 className="timeline-role">{t('about.certs.toeic.role')}</h4>
+                  <h3 className="timeline-company">{data.certs.toeic.company}</h3>
+                  <h4 className="timeline-role">{data.certs.toeic.role}</h4>
                 </div>
               </div>
 
@@ -263,8 +403,8 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">2024</span>
-                  <h3 className="timeline-company">{t('about.certs.efset.company')}</h3>
-                  <h4 className="timeline-role">{t('about.certs.efset.role')}</h4>
+                  <h3 className="timeline-company">{data.certs.efset.company}</h3>
+                  <h4 className="timeline-role">{data.certs.efset.role}</h4>
                 </div>
               </div>
 
@@ -274,9 +414,9 @@ export const About: React.FC = () => {
                 </div>
                 <div className="timeline-content">
                   <span className="timeline-date">2021</span>
-                  <h3 className="timeline-company">{t('about.certs.aws.company')}</h3>
-                  <h4 className="timeline-role">{t('about.certs.aws.role')}</h4>
-                  <p className="timeline-desc">{t('about.certs.aws.desc')}</p>
+                  <h3 className="timeline-company">{data.certs.aws.company}</h3>
+                  <h4 className="timeline-role">{data.certs.aws.role}</h4>
+                  <p className="timeline-desc">{data.certs.aws.desc}</p>
                   <a
                     href="https://buildonvietnam21.s3.ap-southeast-1.amazonaws.com/BOVN21+Certificates/Timo+Digital+Bank_Technophile_Cao+Minh+Do.pdf"
                     target="_blank"
@@ -292,6 +432,18 @@ export const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+
+
+      {/* About edit modal */}
+      <AboutEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentLang={currentLang}
+        initialData={data}
+        onSave={handleSave}
+      />
     </div>
   );
 };
+

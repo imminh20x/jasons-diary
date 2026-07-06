@@ -372,3 +372,30 @@
   color: var(--color-accent-hover);
   text-decoration: underline;
 }
+
+.about-inline-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  margin-left: 0.85rem;
+  padding: 0.375rem;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
+  vertical-align: middle;
+}
+
+.about-inline-edit-btn:hover {
+  color: var(--color-text-highlight);
+  border-color: var(--color-text-muted);
+  background-color: var(--color-bg-muted);
+  transform: translateY(-1px);
+}
+
+.about-inline-edit-btn:active {
+  transform: translateY(0);
+}
+

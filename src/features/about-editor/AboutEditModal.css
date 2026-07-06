@@ -1,0 +1,318 @@
+/* About Edit Modal Styles */
+
+.about-edit-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-overlay);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: backdropFadeIn var(--transition-fast) ease-out;
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.about-edit-modal {
+  width: 100%;
+  max-width: 850px;
+  max-height: 85vh;
+  background-color: var(--color-bg); /* Page canvas background for the overlay card */
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1001;
+  animation: modalSlideIn var(--transition-normal);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.about-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-offset);
+  flex-shrink: 0;
+}
+
+.about-edit-title {
+  margin: 0;
+  font-size: var(--type-section-title);
+  color: var(--color-text-highlight);
+  font-weight: 700;
+}
+
+.about-edit-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.about-edit-close:hover {
+  color: var(--color-text-highlight);
+  background-color: var(--color-bg-muted);
+}
+
+/* Tabs styled exactly like Category Pills / PostEditor tabs */
+.about-edit-tabs {
+  display: flex;
+  margin: 1.25rem 1.5rem 0.5rem;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-offset);
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.about-edit-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.about-edit-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  padding: 0.6rem 0.75rem;
+  border-radius: calc(var(--radius-lg) - 4px);
+  font-weight: 600;
+  font-size: var(--type-caption);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.about-edit-tab-btn:hover {
+  color: var(--color-text-highlight);
+}
+
+.about-edit-tab-btn.active {
+  background-color: var(--color-bg);
+  color: var(--color-text-highlight);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+}
+
+/* Content Area */
+.about-edit-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Reusing .editor-form-section & .editor-section-title from post editor styling */
+.about-editor-section {
+  background-color: var(--color-bg-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.25rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.about-editor-section-title {
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--type-section-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Avatar Upload styling */
+.about-edit-avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding: 1rem;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--color-border);
+}
+
+.about-edit-avatar-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+}
+
+.about-edit-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.about-edit-file-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.about-edit-file-btn input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* List Items / Timeline editor */
+.about-edit-list-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  background-color: var(--color-bg);
+}
+
+.about-edit-list-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+.about-edit-list-item-title {
+  margin: 0;
+  font-size: var(--type-body-sm);
+  font-weight: 700;
+  color: var(--color-text-highlight);
+}
+
+.about-edit-btn-danger-text {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: var(--type-caption);
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.about-edit-btn-danger-text:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.about-edit-add-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--color-bg-offset);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: var(--type-body-sm);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.about-edit-add-btn:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-highlight);
+}
+
+/* Bullet list editor */
+.about-edit-bullets-editor {
+  margin-top: 1rem;
+}
+
+.about-edit-bullet-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+/* Footer & Buttons */
+.about-edit-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-offset);
+  flex-shrink: 0;
+}
+
+.about-edit-error-banner {
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: var(--type-body-sm);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .about-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
